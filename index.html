@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>CARE21</title>
+<title>Anas's Care Plan</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -8,25 +8,26 @@
 /* Layout: sticky app header with role switch and tabs; one view at a time; cards only where a block is its own object (profile, routine, doctor). */
 :root{
   --bg:#F3F6FC; --surface:#FFFFFF; --surface-2:#E7EEFB; --ink:#10234A; --ink-2:#4A5D83; --line:#D3DEF0;
-  --accent:#2456C8; --on-accent:#FFFFFF; --sun:#F6BC2F; --on-sun:#2B2000; --range:#B9CBF3;
+  --accent:#2456C8; --on-accent:#FFFFFF; --sun:#F6BC2F; --on-sun:#2B2000; --sun-soft:#FFF3C7; --range:#B9CBF3;
   --ok:#17794F; --ok-bg:#DDF3E8; --warn:#8A5200; --warn-bg:#FCEBC8; --info:#1B4DB5; --info-bg:#DCE7FC;
   --font-display:'Bricolage Grotesque',system-ui,sans-serif; --font-body:'Figtree','Noto Sans Bengali',system-ui,sans-serif;
-  --scrim:rgba(11,22,48,.8); --on-scrim:#FFFFFF;
+  --scrim:rgba(11,22,48,.8); --on-scrim:#FFFFFF; --tongue:#E26A7A;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#0B1630; --surface:#122046; --surface-2:#1A2C5B; --ink:#E9EFFC; --ink-2:#A7B7DA; --line:#2A4079;
-    --accent:#8FAEFF; --on-accent:#0B1630; --sun:#F6BC2F; --on-sun:#2B2000; --range:#34508F;
+    --accent:#8FAEFF; --on-accent:#0B1630; --sun:#F6BC2F; --on-sun:#2B2000; --sun-soft:#3B300C; --range:#34508F;
     --ok:#6FD6A3; --ok-bg:#12382B; --warn:#F3C26B; --warn-bg:#3F2F0C; --info:#A9C1FF; --info-bg:#1D3270; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#0B1630; --surface:#122046; --surface-2:#1A2C5B; --ink:#E9EFFC; --ink-2:#A7B7DA; --line:#2A4079;
-  --accent:#8FAEFF; --on-accent:#0B1630; --sun:#F6BC2F; --on-sun:#2B2000; --range:#34508F;
+  --accent:#8FAEFF; --on-accent:#0B1630; --sun:#F6BC2F; --on-sun:#2B2000; --sun-soft:#3B300C; --range:#34508F;
   --ok:#6FD6A3; --ok-bg:#12382B; --warn:#F3C26B; --warn-bg:#3F2F0C; --info:#A9C1FF; --info-bg:#1D3270; color-scheme:dark;
 }
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.55}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:.9375rem;line-height:1.55}
+:root{font-size:calc(16px*var(--scale,1))}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--surface);z-index:30}
 .wrap{max-width:1080px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 h1,h2,h3{font-family:var(--font-display);line-height:1.15;margin:0;text-wrap:balance}
@@ -38,15 +39,20 @@ p{margin:0}
 .small{font-size:.86rem}
 .eyebrow{font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
 
-header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--surface);border-bottom:1px solid var(--line)}
-.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:10px}
-.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:800;font-size:1.35rem;letter-spacing:.01em;color:var(--ink);text-decoration:none}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--surface);border-bottom:4px solid var(--sun)}
+body[data-mode="doctor"] header.top{border-bottom-color:var(--accent)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:800;font-size:1.15rem;line-height:1.1;color:var(--ink);text-decoration:none;min-width:0}
+.brand small{display:block;font:700 .64rem var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);margin-top:2px}
+.bars{display:flex;gap:8px;align-items:stretch;height:120px}
+.bars .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;min-width:0}
+.bars .col i{display:block;width:100%;max-width:34px;border-radius:4px 4px 0 0}
 .role{display:flex;background:var(--surface-2);border-radius:999px;padding:3px}
-.role button{border:0;background:transparent;color:var(--ink-2);font:600 .85rem var(--font-body);padding:6px 14px;border-radius:999px;cursor:pointer}
-.role button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.role button{border:0;background:transparent;color:var(--ink-2);font:600 .85rem var(--font-body);padding:6px 12px;border-radius:999px;cursor:pointer}
+.role button[aria-pressed="true"]{background:var(--sun);color:var(--on-sun)}
 .tabs{display:flex;gap:4px;overflow-x:auto;padding-block:0 8px;scrollbar-width:thin}
 .tabs button{flex:none;border:0;background:transparent;color:var(--ink-2);font:600 .92rem var(--font-body);padding:8px 12px;border-radius:8px;cursor:pointer}
-.tabs button[aria-current="page"]{background:var(--surface-2);color:var(--ink);box-shadow:inset 0 -3px 0 var(--sun)}
+.tabs button[aria-current="page"]{background:var(--sun-soft);color:var(--ink);box-shadow:inset 0 -3px 0 var(--sun)}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
 
 .demo{background:var(--info-bg);color:var(--info);font-size:.84rem;padding-block:7px}
@@ -61,9 +67,9 @@ label{display:flex;flex-direction:column;gap:4px;font-weight:600;font-size:.86re
 input[type=text],input[type=number],select,textarea{font:500 1rem var(--font-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;min-width:0;width:100%}
 .fields label{flex:1 1 140px}
 textarea{min-height:84px;resize:vertical}
-.btn{font:700 .92rem var(--font-body);border:0;border-radius:8px;padding:10px 16px;background:var(--accent);color:var(--on-accent);cursor:pointer}
+.btn{font:700 .92rem var(--font-body);border:0;border-radius:8px;padding:11px 18px;min-height:44px;background:var(--sun);color:var(--on-sun);cursor:pointer}
 .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line)}
-.btn.small{padding:6px 10px;font-size:.8rem}
+.btn.small{padding:8px 12px;min-height:38px;font-size:.85rem}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .row-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 
@@ -82,8 +88,8 @@ textarea{min-height:84px;resize:vertical}
 .pill.warn{background:var(--warn-bg);color:var(--warn)}
 
 .seg{display:flex;gap:6px;flex-wrap:wrap}
-.seg button{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 .88rem var(--font-body);padding:8px 14px;border-radius:999px;cursor:pointer}
-.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.seg button{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 .88rem var(--font-body);padding:10px 16px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--sun);color:var(--on-sun);border-color:var(--sun)}
 .guide h3{color:var(--accent)}
 .guide ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}
 .result{border-radius:12px;padding:16px;background:var(--info-bg);color:var(--info);display:flex;flex-direction:column;gap:10px}
@@ -116,6 +122,39 @@ thead th{border-top:0;background:var(--surface-2);font-size:.78rem;letter-spacin
 .toast{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));pointer-events:none;z-index:50}
 .toast span{background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:.9rem;box-shadow:0 4px 18px rgba(0,0,0,.25)}
 footer{color:var(--ink-2);font-size:.84rem}
+.hero{background:var(--sun);color:var(--on-sun);border-radius:14px;padding:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:18px;align-items:center}
+.hero h1,.hero p{color:var(--on-sun)}
+.hero .eyebrow{color:var(--on-sun);opacity:.75}
+.hero-act{display:flex;flex-direction:column;gap:10px}
+.hero .btn{background:var(--on-sun);color:var(--sun)}
+.hero .pbar{background:rgba(43,32,0,.2)}
+.hero .pbar div{background:var(--on-sun)}
+.bar-r{display:flex;gap:8px;align-items:center}
+.tsize{border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:800 .85rem var(--font-body);border-radius:999px;padding:7px 11px;cursor:pointer}
+.tsize[aria-pressed="true"]{background:var(--sun);color:var(--on-sun);border-color:var(--sun)}
+.avatar{width:56px;height:56px;border-radius:50%;background:var(--sun);color:var(--on-sun);font:800 1.5rem var(--font-display);display:grid;place-items:center;border:3px solid var(--ink);flex:none}
+.pt{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.path{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.path div{font-size:.72rem;text-align:center;padding:8px 2px;border-radius:6px;background:var(--surface-2);color:var(--ink-2);font-weight:600;min-width:0}
+.path div.here{background:var(--sun);color:var(--on-sun);font-weight:800}
+.path div.past{background:var(--range);color:var(--ink)}
+.sum{white-space:pre-wrap;font:500 .88rem/1.5 var(--font-body);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:14px;margin:0;overflow-wrap:anywhere}
+.chk{display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap;align-items:flex-start}
+.chk>div{min-width:0}
+.bnav{display:none}
+.sheet{position:fixed;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(74px + env(safe-area-inset-bottom,0px));background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px;display:flex;flex-direction:column;box-shadow:0 8px 28px rgba(0,0,0,.25);z-index:48}
+.sheet button{border:0;background:transparent;color:var(--ink);font:700 1rem var(--font-body);text-align:left;padding:14px 12px;border-radius:8px;cursor:pointer}
+@media (min-width:721px){.sheet{display:none!important}}
+@media (max-width:720px){
+  .tabs{display:none}
+  .bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:45;background:var(--surface);border-top:3px solid var(--sun);padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));gap:4px}
+  .bnav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:transparent;color:var(--ink-2);font:700 .7rem var(--font-body);padding:6px 2px;border-radius:10px;cursor:pointer;min-width:0}
+  .bnav button[aria-current="page"]{color:var(--ink);background:var(--sun-soft)}
+  .bnav svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  main{padding-bottom:110px}
+  .toast{bottom:calc(64px + env(safe-area-inset-bottom,0px));padding-bottom:12px}
+}
 .stage{position:relative;background:var(--surface-2);border-radius:10px;overflow:hidden}
 .stage svg{display:block;width:100%;height:auto}
 .cap{position:absolute;left:0;right:0;bottom:0;padding:10px 14px;background:var(--scrim);color:var(--on-scrim);font-weight:600;text-align:center;min-height:3.2em;display:flex;align-items:center;justify-content:center}
@@ -133,12 +172,12 @@ footer{color:var(--ink-2);font-size:.84rem}
   <div class="wrap bar">
     <a class="brand" href="#home" aria-label="CARE21 home">
       <svg width="30" height="26" viewBox="0 0 30 26" aria-hidden="true"><circle cx="9" cy="9" r="7" style="fill:var(--accent)"/><circle cx="21" cy="9" r="7" style="fill:var(--sun)"/><circle cx="15" cy="18" r="7" style="fill:var(--ink)"/></svg>
-      <span>CARE21</span>
+      <span><span id="brand-name">Anas’s Care Plan</span><small id="brand-sub">CARE21</small></span>
     </a>
-    <div class="role" role="group" aria-label="View as">
+    <div class="bar-r"><button class="tsize" id="tsize" type="button" aria-pressed="false" aria-label="Larger text">A+</button><div class="role" role="group" aria-label="View as">
       <button type="button" data-role="caregiver" aria-pressed="true">Caregiver</button>
       <button type="button" data-role="doctor" aria-pressed="false">Doctor</button>
-    </div>
+    </div></div>
   </div>
   <nav class="wrap tabs" id="nav" aria-label="Sections"></nav>
 </header>
@@ -153,9 +192,13 @@ footer{color:var(--ink-2);font-size:.84rem}
   <section id="v-doctors" data-view hidden></section>
   <section id="v-info" data-view hidden></section>
   <section id="v-patient" data-view hidden></section>
-  <section id="v-orders" data-view hidden></section>
+  <section id="v-planner" data-view hidden></section>
+  <section id="v-prescribe" data-view hidden></section>
+  <section id="v-summary" data-view hidden></section>
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<nav class="bnav" id="bnav" aria-label="Main"></nav>
+<div class="sheet" id="more" hidden></div>
 
 <script>
 (function(){
@@ -164,7 +207,8 @@ var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelect
 function esc(t){return String(t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 
 var DEFAULTS={
-  child:{name:'Aarav',age:18},
+  child:{name:'Anas',age:18},
+  log:[], goal:3, chk:{heart:3,thyroid:12}, ordered:{hearing:true}, rx:[], notes:[],
   done:{},
   ms:{sit:12,crawl:14},
   tests:[
@@ -180,12 +224,15 @@ var DEFAULTS={
 var S;
 try{ var raw=localStorage.getItem('care21-demo'); S=raw?JSON.parse(raw):null; }catch(e){ S=null; }
 if(!S||!S.child||!S.ms){ S=JSON.parse(JSON.stringify(DEFAULTS)); }
+if(!S.log) S.log=[]; if(!S.goal) S.goal=3; if(S.child.name==='Aarav') S.child.name='Anas';
+if(!S.chk) S.chk={heart:3,thyroid:12}; if(!S.ordered) S.ordered={hearing:true}; if(!S.rx) S.rx=[]; if(!S.notes) S.notes=[];
 function save(){ try{ localStorage.setItem('care21-demo',JSON.stringify(S)); }catch(e){} }
 
 var R='caregiver', cur='home', guideBand=null;
+function renderBrand(){ var b=$('#brand-name'); if(b) b.textContent=(S.child.name||'Your child')+'’s Care Plan'; var u=$('#brand-sub'); if(u) u.textContent=(R==='doctor')?'CARE21 · Clinic view':'CARE21'; }
 var NAV={
   caregiver:[['home','Home'],['signs','Early signs'],['guide','Care guide'],['videos','Exercise videos'],['progress','Progress'],['doctors','Find a doctor'],['info','Health info']],
-  doctor:[['patient','Patient file'],['orders','Order tests']]
+  doctor:[['patient','Overview'],['planner','Check-up planner'],['prescribe','Prescribe and message'],['summary','Visit summary']]
 };
 
 var BANDS=[
@@ -269,11 +316,19 @@ function toast(msg){ var t=$('#toast'); t.innerHTML='<span>'+esc(msg)+'</span>';
 /* ---------- navigation ---------- */
 function renderNav(){
   $('#nav').innerHTML=NAV[R].map(function(x){ return '<button type="button" data-go="'+x[0]+'"'+(x[0]===cur?' aria-current="page"':'')+'>'+x[1]+'</button>'; }).join('');
+  var moreOn=MORE.some(function(m){return m[0]===cur;});
+  $('#bnav').innerHTML=BN[R].map(function(x){
+    var on=(x[0]===cur)||(x[0]==='more'&&moreOn);
+    return '<button type="button" '+(x[0]==='more'?'data-more':'data-go="'+x[0]+'"')+(on?' aria-current="page"':'')+'><svg viewBox="0 0 24 24" aria-hidden="true">'+ICONS[x[0]]+'</svg>'+x[1]+'</button>';
+  }).join('');
+  $('#more').innerHTML=MORE.map(function(m){ return '<button type="button" data-go="'+m[0]+'">'+m[1]+'</button>'; }).join('');
+  $('#more').hidden=true;
   $$('[data-role]').forEach(function(b){ b.setAttribute('aria-pressed',String(b.dataset.role===R)); });
+  document.body.dataset.mode=R; renderBrand();
 }
 function show(v){
   if(!NAV[R].some(function(x){return x[0]===v})) v=NAV[R][0][0];
-  cur=v; stopPlayer();
+  cur=v; stopPlayer(); renderBrand();
   $$('[data-view]').forEach(function(s){ s.hidden=(s.id!=='v-'+v); });
   renderNav();
   VIEWS[v]();
@@ -285,13 +340,15 @@ var VIEWS={};
 
 VIEWS.home=function(){
   $('#v-home').innerHTML=
-   '<div class="head"><p class="eyebrow">Caregiver home</p><h1 id="h-title"></h1><p class="muted" id="h-sub"></p></div>'+
+   '<div class="hero"><div><p class="eyebrow">'+(new Date().getHours()<12?'Good morning':(new Date().getHours()<18?'Good afternoon':'Good evening'))+'</p><h1 id="h-title"></h1><p id="h-sub"></p></div><div class="hero-act"><button class="btn" type="button" data-start>Start today’s exercise</button><div class="pbar" role="progressbar" aria-label="Today"><div id="hero-fill"></div></div><p class="small" id="hero-line"></p></div></div>'+
    '<div class="grid2">'+
     '<div class="card"><h2>Child profile</h2><div class="fields">'+
       '<label for="c-name">Name<input id="c-name" type="text" maxlength="30"></label>'+
       '<label for="c-age">Age in months<input id="c-age" type="number" min="0" max="300" inputmode="numeric"></label></div>'+
       '<p class="muted small" id="c-stage"></p></div>'+
     '<div class="card"><h2>Today’s routine</h2><p class="muted small" id="r-count"></p><ul class="checks" id="r-list"></ul><div class="row-actions"><button class="btn ghost small" type="button" data-go="videos">Watch exercise videos</button></div></div>'+
+    '<div class="card" id="rx-card"><h2>From your doctor</h2><div id="rx-body"></div></div>'+
+    '<div class="card"><h2>Recommended exercises</h2><p class="small"><b id="wk-home"></b></p><ul class="rows" id="rec-list"></ul></div>'+
     '<div class="card"><h2>Tests and doctor notes</h2><ul class="rows" id="t-list"></ul></div>'+
     '<div class="card"><h2>Upcoming</h2><ul class="rows" id="a-list"></ul>'+
       '<div class="row-actions"><button class="btn ghost small" type="button" data-go="doctors">Find a doctor</button></div></div>'+
@@ -310,6 +367,10 @@ function updateHome(){
     return '<li><label><input type="checkbox" data-task="'+key+'"'+(on?' checked':'')+'><span>'+esc(t[0])+'</span><em class="meta">'+t[1]+'</em></label></li>';
   }).join('');
   $('#r-count').textContent=n+' of '+TASKS[b].length+' done today';
+  renderBrand();
+  $('#wk-home').textContent=weekLine();
+  homeExtras();
+  $('#rec-list').innerHTML=EX.map(function(x,i){ return x.bands.indexOf(b)>-1?'<li><div class="top"><div><b>'+x.t+'</b><br><span class="small muted">'+x.cat+' · '+x.stage+'</span></div><button class="btn ghost small" type="button" data-watch="'+i+'">Watch</button></div></li>':''; }).join('')||'<li class="muted">No exercises for this age yet.</li>';
   $('#t-list').innerHTML=S.tests.map(function(t){
     return '<li><div class="top"><b>'+esc(t.n)+'</b><span class="pill '+(t.s==='Done'?'ok':'warn')+'">'+esc(t.s)+'</span></div><span class="muted small">'+esc(t.d)+(t.note?' · '+esc(t.note):'')+'</span></li>';
   }).join('')||'<li class="muted">No tests yet.</li>';
@@ -371,6 +432,7 @@ VIEWS.progress=function(){
   $('#v-progress').innerHTML=
    '<div class="head"><p class="eyebrow">Progress</p><h1>'+esc(S.child.name||'Your child')+'’s milestones</h1><p class="muted">Children with Down syndrome reach milestones on their own timeline. The bars show broad ranges, so a later date is not a failure. Share this view with the doctor.</p></div>'+
    '<div class="grid2"><div class="card">'+chartHTML(false)+'</div>'+
+   '<div class="card">'+logHTML(false)+'</div>'+
    '<div class="card"><h2>Log a milestone</h2><form id="ms-form"><div class="fields">'+
      '<label for="ms-k">Milestone<select id="ms-k">'+left.map(function(m){return '<option value="'+m.k+'">'+m.l+'</option>';}).join('')+'</select></label>'+
      '<label for="ms-a">Age reached (months)<input id="ms-a" type="number" min="0" max="300" value="'+S.child.age+'" inputmode="numeric"></label></div>'+
@@ -413,29 +475,210 @@ VIEWS.info=function(){
    '<div class="card"><h2>See a doctor promptly if</h2><ul class="plain" style="gap:6px">'+
    ['Breathing is difficult, or the lips look blue.','Your child keeps vomiting or will not feed.','There is neck pain, new weakness, trouble walking, or loss of bladder control.','A seizure happens, or a fever does not settle.'].map(function(x){return '<li>• '+x+'</li>';}).join('')+
    '</ul></div>'+
-   '<footer>This is a demo. The next step is a mobile app: the same screens can be packaged as an installable Android app (APK) once the flows are agreed.</footer>';
+   '<footer>This is a demo. The next step is a mobile app: the same screens can be packaged as an installable Android app (APK) once the flows are agreed. <button class="linkbtn" type="button" data-reset>Reset demo data</button></footer>';
 };
+
+/* ---------- doctor workspace ---------- */
+var CHECKS=[
+ {k:'heart',n:'Heart scan (echocardiogram)',test:'Echocardiogram (heart)',first:0,ev:0,why:'Looks for heart conditions early.'},
+ {k:'thyroid',n:'Thyroid blood test',test:'Thyroid blood test (TSH)',first:0,ev:12,why:'Low thyroid can slow growth and learning.'},
+ {k:'hearing',n:'Hearing test',test:'Hearing test',first:0,ev:12,why:'Ear fluid and infections are common.'},
+ {k:'eyes',n:'Eye exam',test:'Eye exam',first:6,ev:12,why:'Checks for squint, cataract and the need for glasses.'},
+ {k:'dental',n:'Dental check',test:'Dental check',first:12,ev:6,why:'Early habits protect teeth and gums.'},
+ {k:'sleep',n:'Sleep study',test:'Sleep study',first:48,ev:0,why:'Sleep apnea affects mood, learning and the heart.'}
+];
+var OTHERS=['Complete blood count','Chromosome test (karyotype)'];
+var TPL=[['Good progress','Good progress. Please continue the home exercises.'],['Repeat thyroid test','Please repeat the thyroid blood test in 6 months.'],['Speech therapy','I recommend a speech therapy assessment.'],['Review visit','Please book a review visit in 4 weeks.']];
+var chkNote='', visitNote='';
+function dateStr(){ return new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'}); }
+function chkStatus(c){
+  var a=S.child.age, last=S.chk[c.k];
+  if(S.ordered[c.k]) return {s:'Ordered',cls:'',sort:1,txt:'Waiting for the result'};
+  if(last==null){
+    if(a>=c.first) return {s:'Due now',cls:'warn',sort:0,txt:'No result recorded yet'};
+    return {s:'Upcoming',cls:'',sort:3,txt:'From age '+ageText(c.first)};
+  }
+  if(c.ev===0) return {s:'Done',cls:'ok',sort:4,txt:'Done at '+ageText(last)};
+  var next=last+c.ev;
+  if(a>=next) return {s:'Due now',cls:'warn',sort:0,txt:'Last done at '+ageText(last)};
+  return {s:'Up to date',cls:'ok',sort:4,txt:'Next at '+ageText(next)};
+}
+function rxCount(title){ var from=dayStart(Date.now()-6*DAY); return S.log.filter(function(l){return l.n===title&&l.ts>=from;}).length; }
+function rxRows(links){
+  return S.rx.map(function(r){
+    var i=-1; EX.some(function(x,j){ if(x.t===r.ex){i=j;return true;} });
+    return '<li><div class="top"><div><b>'+esc(r.ex)+'</b><br><span class="small muted">'+r.n+' times a week'+(r.note?' · '+esc(r.note):'')+' · '+rxCount(r.ex)+' of '+r.n+' this week</span></div>'+
+      (links&&i>-1?'<button class="btn ghost small" type="button" data-watch="'+i+'">Watch</button>':'')+'</div></li>';
+  }).join('');
+}
+function homeExtras(){
+  var b=band(S.child.age), done=0, tot=TASKS[b].length;
+  TASKS[b].forEach(function(t,i){ if(S.done[b+'-'+i]) done++; });
+  var f=$('#hero-fill'); if(f) f.style.width=(done/tot*100).toFixed(0)+'%';
+  var l=$('#hero-line'); if(l) l.textContent=done+' of '+tot+' routine tasks done today · '+weekLine();
+  var box=$('#rx-body'); if(!box) return;
+  var msgs=S.notes.slice(0,3).map(function(m){ return '<li><b>Message</b> <span class="small muted">'+esc(m.d)+'</span><br>'+esc(m.t)+'</li>'; }).join('');
+  var rx=rxRows(true);
+  box.innerHTML=(msgs||rx)?('<ul class="rows">'+msgs+rx+'</ul>'):'<p class="muted small">Nothing yet. Your doctor can prescribe exercises and send notes here. Switch to Doctor view to try it.</p>';
+}
+function startToday(){
+  var b=band(S.child.age), idx=-1;
+  if(S.rx.length) EX.some(function(x,j){ if(x.t===S.rx[0].ex){idx=j;return true;} });
+  if(idx<0) EX.some(function(x,j){ if(x.bands.indexOf(b)>-1){idx=j;return true;} });
+  if(idx<0) idx=0;
+  plPause(); pl.ex=idx; pl.t=0; pl.last=''; show('videos');
+}
 
 VIEWS.patient=function(){
-  var n=0,b=band(S.child.age); TASKS[b].forEach(function(t,i){ if(S.done[b+'-'+i]) n++; });
+  var c=S.child, b=band(c.age), due=[], ord=0;
+  CHECKS.forEach(function(k){ var s=chkStatus(k); if(s.s==='Due now') due.push(k); if(s.s==='Ordered') ord++; });
   $('#v-patient').innerHTML=
-   '<div class="head"><p class="eyebrow">Doctor view</p><h1>'+esc(S.child.name||'Patient')+', '+ageText(S.child.age)+'</h1>'+
-   '<p class="muted">Summary shared by the caregiver. Home routine today: '+n+' of '+TASKS[b].length+' done.</p></div>'+
-   '<div class="grid2"><div class="card"><h2>Milestones</h2>'+chartHTML(true)+'</div>'+
-   '<div class="card"><h2>Tests and notes</h2><ul class="rows">'+S.tests.map(function(t){
-      return '<li><div class="top"><b>'+esc(t.n)+'</b><span class="pill '+(t.s==='Done'?'ok':'warn')+'">'+esc(t.s)+'</span></div><span class="muted small">'+esc(t.d)+(t.note?' · '+esc(t.note):'')+'</span></li>';
-   }).join('')+'</ul><div class="row-actions"><button class="btn small" type="button" data-go="orders">Order tests</button></div></div></div>';
+   '<div class="card"><div class="pt"><div class="avatar" aria-hidden="true">'+esc((c.name||'?').charAt(0).toUpperCase())+'</div><div><p class="eyebrow">Patient overview</p><h1>'+esc(c.name||'Patient')+'</h1><p class="muted">'+ageText(c.age)+' · '+BANDS[b].l+' stage</p></div></div>'+
+   '<div class="path" aria-label="Life stages">'+BANDS.map(function(x,i){ return '<div class="'+(i<b?'past':(i===b?'here':''))+'">'+x.l+(i===b?'<br>Now':'')+'</div>'; }).join('')+'</div>'+
+   '<div class="chips"><span class="pill'+(due.length?' warn':' ok')+'">'+due.length+' check-up'+(due.length===1?'':'s')+' due</span><span class="pill">'+ord+' ordered</span><span class="pill ok">'+weekCount()+' of '+S.goal+' sessions this week</span></div></div>'+
+   '<div class="grid2">'+
+   '<div class="card"><h2>Needs attention</h2>'+(due.length?'<ul class="rows">'+due.map(function(k){return '<li><div class="top"><b>'+k.n+'</b><span class="pill warn">Due now</span></div><span class="small muted">'+k.why+'</span></li>';}).join('')+'</ul>':'<p class="muted">All check-ups are up to date or ordered.</p>')+
+     '<div class="row-actions"><button class="btn small" type="button" data-go="planner">Open check-up planner</button></div></div>'+
+   '<div class="card">'+logHTML(true)+'</div>'+
+   '<div class="card"><h2>Milestones</h2>'+chartHTML(true)+'</div>'+
+   '<div class="card"><h2>Prescribed exercises</h2>'+(S.rx.length?'<ul class="rows">'+rxRows(false)+'</ul>':'<p class="muted">None yet.</p>')+
+     '<div class="row-actions"><button class="btn small" type="button" data-go="prescribe">Prescribe an exercise</button></div></div>'+
+   '</div>';
 };
 
-VIEWS.orders=function(){
-  $('#v-orders').innerHTML=
-   '<div class="head"><p class="eyebrow">Doctor view</p><h1>Order tests</h1><p class="muted">Selected tests and your note appear on the caregiver’s home screen. Switch back to Caregiver to see them.</p></div>'+
-   '<form class="card" id="ord-form" style="max-width:640px"><ul class="checks">'+ORDERS.map(function(o,i){
-      return '<li><label><input type="checkbox" data-ord="'+i+'"><span>'+o+'</span></label></li>';
-   }).join('')+'</ul>'+
-   '<label for="ord-note">Note for the caregiver<textarea id="ord-note" maxlength="160" placeholder="For example: fasting is not needed. Bring previous reports."></textarea></label>'+
-   '<div class="row-actions"><button class="btn" type="submit">Send to caregiver</button></div></form>';
+VIEWS.planner=function(){
+  var list=CHECKS.map(function(c){ return {c:c,s:chkStatus(c)}; }).sort(function(a,b){return a.s.sort-b.s.sort;});
+  $('#v-planner').innerHTML=
+   '<div class="head"><p class="eyebrow">Check-up planner</p><h1>What is due for '+esc(S.child.name||'the patient')+'?</h1><p class="muted">Built from the child’s age and recorded results. Ordering a test adds it to the caregiver’s home screen.</p></div>'+
+   '<div class="grid2"><div class="card"><h2>Routine checks</h2><ul class="rows">'+list.map(function(x){
+      var c=x.c,s=x.s;
+      return '<li><div class="chk"><div><b>'+c.n+'</b><br><span class="small muted">'+c.why+'</span><br><span class="small">'+s.txt+'</span></div>'+
+        '<div class="row-actions"><span class="pill '+s.cls+'">'+s.s+'</span>'+
+        (s.s==='Ordered'?'<button class="btn small" type="button" data-chk-done="'+c.k+'">Record result</button>':'<button class="btn small ghost" type="button" data-chk-order="'+c.k+'">Order</button><button class="btn small ghost" type="button" data-chk-done="'+c.k+'">Mark done</button>')+
+        '</div></div></li>';
+   }).join('')+'</ul></div>'+
+   '<div class="card"><h2>Note for the caregiver</h2><label for="chk-note">Shown with the next test you order or record<textarea id="chk-note" maxlength="160" placeholder="For example: no fasting needed. Bring previous reports."></textarea></label>'+
+   '<h3>Other tests</h3><div class="seg" role="group" aria-label="Other tests">'+OTHERS.map(function(o,i){return '<button type="button" data-other="'+i+'">Order '+o+'</button>';}).join('')+'</div></div></div>';
+  $('#chk-note').value=chkNote;
 };
+
+VIEWS.prescribe=function(){
+  $('#v-prescribe').innerHTML=
+   '<div class="head"><p class="eyebrow">Prescribe and message</p><h1>Set the home plan</h1><p class="muted">Prescribed exercises and messages appear on the caregiver’s Home screen.</p></div>'+
+   '<div class="grid2"><form class="card" id="rx-form"><h2>Prescribe an exercise</h2><div class="fields">'+
+   '<label for="rx-ex">Exercise<select id="rx-ex">'+EX.map(function(x){return '<option>'+x.t+'</option>';}).join('')+'</select></label>'+
+   '<label for="rx-n">Times a week<select id="rx-n">'+[1,2,3,4,5,6,7].map(function(n){return '<option'+(n===3?' selected':'')+'>'+n+'</option>';}).join('')+'</select></label></div>'+
+   '<label for="rx-note">Instruction<input id="rx-note" type="text" maxlength="100" placeholder="For example: slow pace, hold for 3 seconds"></label>'+
+   '<div class="row-actions"><button class="btn" type="submit">Prescribe</button></div>'+
+   '<ul class="rows" id="rx-cur"></ul></form>'+
+   '<form class="card" id="msg-form"><h2>Message to the caregiver</h2><div class="seg" role="group" aria-label="Quick phrases">'+TPL.map(function(t,i){return '<button type="button" data-tpl="'+i+'">'+t[0]+'</button>';}).join('')+'</div>'+
+   '<label for="msg-t">Message<textarea id="msg-t" maxlength="240"></textarea></label>'+
+   '<div class="row-actions"><button class="btn" type="submit">Send</button></div><ul class="rows" id="msg-cur"></ul></form></div>';
+  listRx(); listMsgs();
+};
+function listRx(){
+  var el=$('#rx-cur'); if(!el) return;
+  el.innerHTML=S.rx.map(function(r,i){ return '<li><div class="top"><div><b>'+esc(r.ex)+'</b><br><span class="small muted">'+r.n+' times a week'+(r.note?' · '+esc(r.note):'')+'</span></div><button class="btn ghost small" type="button" data-rx-del="'+i+'">Remove</button></div></li>'; }).join('')||'<li class="muted small">No prescriptions yet.</li>';
+}
+function listMsgs(){
+  var el=$('#msg-cur'); if(!el) return;
+  el.innerHTML=S.notes.map(function(m,i){ return '<li><div class="top"><span class="small muted">'+esc(m.d)+'</span><button class="linkbtn" type="button" data-msg-del="'+i+'">Delete</button></div>'+esc(m.t)+'</li>'; }).join('')||'<li class="muted small">No messages yet.</li>';
+}
+
+function summaryText(){
+  var c=S.child, L=[];
+  L.push('Visit summary: '+(c.name||'Patient')+', '+ageText(c.age)+' ('+BANDS[band(c.age)].l+')');
+  L.push('');
+  var got=MS.filter(function(m){return S.ms[m.k]!=null;}).map(function(m){return m.l+' at '+S.ms[m.k]+' months';});
+  var not=MS.filter(function(m){return S.ms[m.k]==null;}).map(function(m){return m.l;});
+  L.push('Milestones reached: '+(got.join('; ')||'none logged'));
+  L.push('Not yet: '+(not.join(', ')||'none'));
+  L.push('');
+  L.push('Home exercise: '+weekLine());
+  L.push('');
+  L.push('Check-ups:');
+  CHECKS.forEach(function(k){ var s=chkStatus(k); L.push('- '+k.n+': '+s.s+' ('+s.txt+')'); });
+  L.push('');
+  L.push('Prescribed exercises: '+(S.rx.map(function(r){return r.ex+' '+r.n+' times a week';}).join('; ')||'none'));
+  if(S.notes.length) L.push('Last message to caregiver: '+S.notes[0].t);
+  if(visitNote.trim()){ L.push(''); L.push('Doctor’s notes: '+visitNote.trim()); }
+  L.push(''); L.push('Demo data. Not a medical record.');
+  return L.join('\n');
+}
+VIEWS.summary=function(){
+  $('#v-summary').innerHTML=
+   '<div class="head"><p class="eyebrow">Visit summary</p><h1>Ready for the visit</h1><p class="muted">Built from the caregiver’s log and your orders. Add your notes, then copy it into the patient record.</p></div>'+
+   '<div class="grid2"><div class="card"><label for="sum-note">Your notes for this visit<textarea id="sum-note" maxlength="500"></textarea></label><div class="row-actions"><button class="btn" type="button" data-copy>Copy summary</button></div></div>'+
+   '<div class="card"><h2>Summary</h2><pre class="sum" id="sum-pre"></pre></div></div>';
+  $('#sum-note').value=visitNote; $('#sum-pre').textContent=summaryText();
+};
+function selectSum(){ var el=$('#sum-pre'); if(!el) return; try{ var r=document.createRange(); r.selectNodeContents(el); var s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }catch(e){} toast('Selected. Use your device’s copy command.'); }
+
+/* ---------- navigation chrome, text size ---------- */
+var ICONS={
+ home:'<path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/>',
+ videos:'<circle cx="12" cy="12" r="9"/><path d="M10 8l6 4-6 4z"/>',
+ progress:'<path d="M5 20V12M12 20V5M19 20v-9"/>',
+ doctors:'<path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+ more:'<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
+ patient:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/>',
+ planner:'<path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/>',
+ prescribe:'<path d="M9 4h6v3H9zM6 6h12v15H6zM9 12h6M9 16h6"/>',
+ summary:'<path d="M6 3h9l4 4v14H6zM9 12h7M9 16h7"/>'
+};
+var BN={
+ caregiver:[['home','Home'],['videos','Videos'],['progress','Progress'],['doctors','Doctors'],['more','More']],
+ doctor:[['patient','Overview'],['planner','Check-ups'],['prescribe','Prescribe'],['summary','Summary']]
+};
+var MORE=[['signs','Early signs'],['guide','Care guide'],['info','Health info']];
+function setScale(on){
+  document.documentElement.style.setProperty('--scale',on?'1.2':'1');
+  var b=$('#tsize'); if(b) b.setAttribute('aria-pressed',String(on));
+  try{ localStorage.setItem('care21-big',on?'1':'0'); }catch(e){}
+}
+document.addEventListener('click',function(e){
+  var t=e.target.closest('#tsize,[data-start],[data-more],[data-chk-order],[data-chk-done],[data-other],[data-rx-del],[data-msg-del],[data-tpl],[data-copy]');
+  var more=$('#more');
+  if(!t){ if(more&&!more.hidden&&!e.target.closest('#more')) more.hidden=true; return; }
+  if(t.id==='tsize'){ setScale(t.getAttribute('aria-pressed')!=='true'); return; }
+  if(t.dataset.start!==undefined){ startToday(); return; }
+  if(t.dataset.more!==undefined){ more.hidden=!more.hidden; return; }
+  if(t.dataset.chkOrder){
+    var c=CHECKS.filter(function(x){return x.k===t.dataset.chkOrder;})[0];
+    S.ordered[c.k]=true; S.tests.unshift({n:c.test,s:'Ordered',d:dateStr(),note:chkNote}); save(); VIEWS.planner(); toast(c.n+' ordered. The caregiver can see it.'); return;
+  }
+  if(t.dataset.chkDone){
+    var d=CHECKS.filter(function(x){return x.k===t.dataset.chkDone;})[0], found=false;
+    delete S.ordered[d.k]; S.chk[d.k]=S.child.age;
+    S.tests.forEach(function(x){ if(!found&&x.n===d.test&&x.s==='Ordered'){ x.s='Done'; x.d=dateStr(); if(chkNote) x.note=chkNote; found=true; } });
+    if(!found) S.tests.unshift({n:d.test,s:'Done',d:dateStr(),note:chkNote});
+    save(); VIEWS.planner(); toast(d.n+' recorded as done.'); return;
+  }
+  if(t.dataset.other!==undefined){
+    var o=OTHERS[+t.dataset.other]; S.tests.unshift({n:o,s:'Ordered',d:dateStr(),note:chkNote}); save(); toast(o+' ordered.'); return;
+  }
+  if(t.dataset.rxDel!==undefined){ S.rx.splice(+t.dataset.rxDel,1); save(); listRx(); return; }
+  if(t.dataset.msgDel!==undefined){ S.notes.splice(+t.dataset.msgDel,1); save(); listMsgs(); return; }
+  if(t.dataset.tpl!==undefined){ var ta=$('#msg-t'); ta.value=(ta.value?ta.value+' ':'')+TPL[+t.dataset.tpl][1]; ta.focus(); return; }
+  if(t.dataset.copy!==undefined){
+    var txt=summaryText();
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(function(){ toast('Summary copied.'); },function(){ selectSum(); }); }
+    else selectSum();
+  }
+});
+document.addEventListener('input',function(e){
+  if(e.target.id==='chk-note') chkNote=e.target.value;
+  else if(e.target.id==='sum-note'){ visitNote=e.target.value; $('#sum-pre').textContent=summaryText(); }
+});
+document.addEventListener('submit',function(e){
+  if(e.target.id==='rx-form'){
+    S.rx.push({ex:$('#rx-ex').value,n:+$('#rx-n').value,note:$('#rx-note').value.trim()}); save(); $('#rx-note').value=''; listRx(); toast('Prescribed. It now shows on the caregiver’s Home screen.');
+  } else if(e.target.id==='msg-form'){
+    var v=$('#msg-t').value.trim(); if(!v){ toast('Write a message first.'); return; }
+    S.notes.unshift({t:v,d:dateStr()}); save(); $('#msg-t').value=''; listMsgs(); toast('Message sent to the caregiver.');
+  }
+});
+try{ if(localStorage.getItem('care21-big')==='1') setScale(true); }catch(e){}
 
 /* ---------- exercise videos: animated demos with voice, captions and chimes ---------- */
 function P(h,s,hp,e,hd,k,f,k2,f2){ return {h:h,s:s,hp:hp,e:e,hd:hd,k:k,f:f,k2:k2||[k[0]+7,k[1]],f2:f2||[f[0]+7,f[1]]}; }
@@ -477,11 +720,13 @@ var EX=[
 ];
 var TX={start:{en:'Press Play to start.',bn:'শুরু করতে প্লে চাপুন।'},done:{en:'Well done! Session complete.',bn:'খুব ভালো! সেশন শেষ।'}};
 var STEPMS=3400;
-var pl={ex:null,t:0,playing:false,speed:1,voice:true,lang:'en',last:'',raf:0,prev:0,ac:null};
+var pl={cat:'All',ex:null,t:0,playing:false,speed:1,voice:true,lang:'en',last:'',raf:0,prev:0,ac:null};
 
-function plInfo(){ var ex=EX[pl.ex], n=ex.steps.length, cycle=n*STEPMS; return {ex:ex,n:n,cycle:cycle,total:cycle*ex.reps}; }
+function stepDurs(ex){ return ex.steps.map(function(st){ return Math.max(4500,st[pl.lang].length*115); }); }
+function plInfo(){ var ex=EX[pl.ex], d=stepDurs(ex), cycle=d.reduce(function(a,b){return a+b;},0); return {ex:ex,n:ex.steps.length,d:d,cycle:cycle,total:cycle*ex.reps}; }
 function fmt(ms){ var s=Math.round(ms/1000), m=Math.floor(s/60); s=s%60; return m+':'+(s<10?'0':'')+s; }
 function stageSVG(ex){
+  if(ex.kind==='face') return faceSVG(ex);
   var base=' fill="none" stroke-linecap="round" stroke-linejoin="round"';
   return '<svg viewBox="0 0 400 230" role="img" aria-label="Animated demonstration: '+ex.t+'">'+
    '<rect x="0" y="205" width="400" height="25" style="fill:var(--line)"/>'+SC[ex.scene]+
@@ -505,12 +750,14 @@ function plDraw(p){
 function plRender(){
   if(pl.ex===null||!$('#pl-cap')) return;
   var I=plInfo(), ex=I.ex, done=pl.t>=I.total, t=Math.min(pl.t,I.total-1);
-  var rep=Math.floor(t/I.cycle), within=t-rep*I.cycle, idx=Math.floor(within/STEPMS), local=within-idx*STEPMS;
+  var rep=Math.floor(t/I.cycle), within=t-rep*I.cycle, idx=0, acc=0;
+  while(idx<I.n-1&&within>=acc+I.d[idx]){ acc+=I.d[idx]; idx++; }
+  var local=within-acc;
   var step=ex.steps[idx], prev=ex.steps[(idx+I.n-1)%I.n];
-  var k=Math.min(1,local/(STEPMS*0.45)); k=k*k*(3-2*k);
+  var k=Math.min(1,local/Math.min(1800,I.d[idx]*0.45)); k=k*k*(3-2*k);
   var A=ex.poses[prev.p], B=ex.poses[step.p], pose={};
-  PK.forEach(function(key){ pose[key]=[A[key][0]+(B[key][0]-A[key][0])*k, A[key][1]+(B[key][1]-A[key][1])*k]; });
-  plDraw(pose);
+  if(ex.kind==='face'){ faceDraw(A.map(function(v,i){return v+(B[i]-v)*k;})); }
+  else { PK.forEach(function(key){ pose[key]=[A[key][0]+(B[key][0]-A[key][0])*k, A[key][1]+(B[key][1]-A[key][1])*k]; }); plDraw(pose); }
   $('#pl-cap').textContent=done?TX.done[pl.lang]:((pl.t===0&&!pl.playing)?TX.start[pl.lang]:step[pl.lang]);
   $('#pl-fill').style.width=(Math.min(1,pl.t/I.total)*100).toFixed(1)+'%';
   $('#pl-time').textContent=fmt(Math.min(pl.t,I.total))+' / '+fmt(I.total);
@@ -524,7 +771,7 @@ function plTick(ts){
   if(!pl.playing) return;
   var dt=Math.min(100,ts-pl.prev); pl.prev=ts; pl.t+=dt*pl.speed;
   var I=plInfo();
-  if(pl.t>=I.total){ pl.t=I.total; pl.playing=false; plRender(); plChime(true); plSpeak(TX.done[pl.lang]); return; }
+  if(pl.t>=I.total){ pl.t=I.total; pl.playing=false; plRender(); plChime(true); plSpeak(TX.done[pl.lang]); toast('Session complete. Tap Log this session to save it.'); return; }
   plRender(); pl.raf=requestAnimationFrame(plTick);
 }
 function initAudio(){
@@ -546,7 +793,7 @@ function plSpeak(text){
   if(!pl.voice||!('speechSynthesis' in window)) return;
   try{
     window.speechSynthesis.cancel();
-    var u=new SpeechSynthesisUtterance(text); u.lang=(pl.lang==='bn')?'bn-BD':'en-US'; u.rate=0.92;
+    var u=new SpeechSynthesisUtterance(text); u.lang=(pl.lang==='bn')?'bn-BD':'en-US'; u.rate=pl.speed<1?0.55:0.7;
     window.speechSynthesis.speak(u);
   }catch(e){}
 }
@@ -572,35 +819,166 @@ function plNote(){
   }catch(e){}
   return msg;
 }
+/* more exercises, categories, face demos, session log */
+SC.chair='<rect x="150" y="100" width="12" height="105" style="fill:var(--range)"/><rect x="150" y="150" width="92" height="12" style="fill:var(--range)"/><rect x="230" y="162" width="10" height="43" style="fill:var(--range)"/>';
+SC.toy='<circle cx="160" cy="112" r="9" style="fill:var(--sun);stroke:var(--ink);stroke-width:2"/>';
+SC.ball='<circle cx="285" cy="192" r="12" style="fill:var(--surface);stroke:var(--ink);stroke-width:2"/>';
+var META={'Tummy time':{cat:'Movement',bands:[0],ord:1},'Pull to stand':{cat:'Movement',bands:[1],ord:6},'Step up':{cat:'Movement',bands:[2],ord:9},'Balance and reach':{cat:'Movement',bands:[3,4],ord:11}};
+EX.forEach(function(x){ var m=META[x.t]; x.cat=m.cat; x.bands=m.bands; x.ord=m.ord; });
+var NEWEX=[
+ {t:'Reach for a toy',stage:'0–12 months',cat:'Movement',bands:[0],ord:0,scene:'toy',reps:3,
+  poses:[P([110,186],[150,190],[255,192],[185,196],[215,198],[300,194],[350,196],[300,196],[350,198]),
+         P([110,186],[150,190],[255,192],[158,158],[160,126],[300,172],[350,180],[300,176],[352,184])],
+  steps:[{p:0,en:'Lay your baby on their back. Hold a bright toy above the chest.',bn:'শিশুকে চিৎ করে শোয়ান। বুকের উপরে একটি উজ্জ্বল খেলনা ধরুন।'},
+         {p:1,en:'Wait for your baby to reach up with one hand.',bn:'শিশু এক হাত তুলে নাগাল পাওয়ার জন্য অপেক্ষা করুন।'},
+         {p:1,en:'Let your baby touch the toy. Say well done.',bn:'শিশুকে খেলনা ছুঁতে দিন। বলুন, খুব ভালো।'},
+         {p:0,en:'Rest and switch to the other side.',bn:'বিশ্রাম নিন এবং অন্য পাশে যান।'}]},
+ {t:'Sitting balance',stage:'6–18 months',cat:'Movement',bands:[0,1],ord:2,scene:'floor',reps:3,
+  poses:[P([180,116],[180,140],[180,190],[205,160],[228,172],[230,178],[268,196],[225,186],[262,200]),
+         P([180,116],[180,140],[180,190],[215,130],[250,128],[230,178],[268,196],[225,186],[262,200]),
+         P([180,110],[180,134],[180,190],[200,110],[212,86],[230,178],[268,196],[225,186],[262,200])],
+  steps:[{p:0,en:'Sit your child on the floor. Sit close behind or beside them.',bn:'শিশুকে মেঝেতে বসান। পেছনে বা পাশে কাছে বসুন।'},
+         {p:1,en:'Hold a toy in front. Let your child reach for it.',bn:'সামনে একটি খেলনা ধরুন। শিশুকে নাগাল পেতে দিন।'},
+         {p:2,en:'Move the toy up and to the side. Keep your child sitting tall.',bn:'খেলনা উপরে ও পাশে নিন। শিশুকে সোজা বসে থাকতে দিন।'},
+         {p:0,en:'Rest and clap together.',bn:'বিশ্রাম নিন এবং একসাথে হাততালি দিন।'}]},
+ {t:'Crawling',stage:'8–24 months',cat:'Movement',bands:[0,1],ord:3,scene:'floor',reps:3,
+  poses:[P([112,128],[135,140],[230,145],[138,172],[140,198],[232,190],[268,198]),
+         P([112,128],[135,140],[230,145],[160,165],[172,198],[215,176],[240,198]),
+         P([112,126],[135,138],[230,143],[138,172],[140,198],[232,190],[268,198])],
+  steps:[{p:0,en:'Help your child onto hands and knees. Place a toy in front.',bn:'শিশুকে হাত ও হাঁটুর উপর ভর দিতে সাহায্য করুন। সামনে খেলনা রাখুন।'},
+         {p:1,en:'Encourage one hand and the opposite knee to move forward.',bn:'এক হাত ও উল্টো দিকের হাঁটু সামনে এগোতে উৎসাহ দিন।'},
+         {p:0,en:'Now the other hand and knee. Keep going toward the toy.',bn:'এবার অন্য হাত ও হাঁটু। খেলনার দিকে এগোতে থাকুন।'},
+         {p:0,en:'Cheer and rest.',bn:'উৎসাহ দিন এবং বিশ্রাম নিন।'}]},
+ {t:'Lip and cheek play',stage:'0–3 years',kind:'face',cat:'Speech and feeding',bands:[0,1,2],ord:4,reps:3,
+  poses:[[36,0,0,0],[13,10,0,0],[22,0,0,1],[52,5,0,0]],
+  steps:[{p:0,en:'Sit face to face so your child can see your mouth.',bn:'মুখোমুখি বসুন, যাতে শিশু আপনার মুখ দেখতে পারে।'},
+         {p:1,en:'Make a kiss shape with your lips. Let your child copy you.',bn:'ঠোঁট দিয়ে চুমুর আকার করুন। শিশুকে নকল করতে দিন।'},
+         {p:2,en:'Puff out your cheeks. Gently pat them.',bn:'গাল ফুলিয়ে নিন। আলতো করে চাপড় দিন।'},
+         {p:3,en:'Make a big smile.',bn:'বড় করে হাসুন।'},
+         {p:0,en:'Rest and cuddle.',bn:'বিশ্রাম নিন এবং আদর করুন।'}]},
+ {t:'Sounds: aah, ooh, eee',stage:'1–6 years',kind:'face',cat:'Speech and feeding',bands:[1,2],ord:5,reps:3,
+  poses:[[34,0,0,0],[26,40,0,0],[12,18,0,0],[54,6,0,0]],
+  steps:[{p:0,en:'Face your child and get their attention.',bn:'শিশুর মুখোমুখি হয়ে তার মনোযোগ নিন।'},
+         {p:1,en:'Open wide and say aah. Hold for two seconds.',bn:'মুখ বড় করে খুলে বলুন আ। দুই সেকেন্ড ধরে রাখুন।'},
+         {p:2,en:'Round your lips and say ooh.',bn:'ঠোঁট গোল করে বলুন উ।'},
+         {p:3,en:'Smile wide and say eee.',bn:'চওড়া হেসে বলুন ই।'},
+         {p:0,en:'Praise every try, even small sounds.',bn:'প্রতিটি চেষ্টার প্রশংসা করুন, ছোট শব্দেরও।'}]},
+ {t:'Sit to stand',stage:'1–6 years',cat:'Movement',bands:[1,2],ord:7,scene:'chair',reps:3,
+  poses:[P([195,66],[195,90],[195,140],[215,112],[236,120],[240,142],[244,198]),
+         P([205,40],[205,64],[205,114],[228,86],[250,86],[208,160],[208,205])],
+  steps:[{p:0,en:'Sit on a sturdy chair with feet flat on the floor.',bn:'শক্ত চেয়ারে বসুন, পা মেঝেতে সমতলভাবে রাখুন।'},
+         {p:1,en:'Lean forward and stand up. Reach your arms ahead.',bn:'সামনে ঝুঁকে উঠে দাঁড়ান। হাত সামনে বাড়ান।'},
+         {p:1,en:'Stand tall for two seconds.',bn:'দুই সেকেন্ড সোজা দাঁড়িয়ে থাকুন।'},
+         {p:0,en:'Sit down slowly.',bn:'ধীরে ধীরে বসুন।'}]},
+ {t:'Marching',stage:'2–10 years',cat:'Movement',bands:[2,3],ord:8,scene:'floor',reps:3,
+  poses:[P([200,40],[200,64],[200,114],[200,92],[206,118],[202,160],[202,205],[210,160],[210,205]),
+         P([200,40],[200,64],[200,114],[222,88],[240,100],[222,138],[222,174],[200,160],[200,205]),
+         P([200,40],[200,64],[200,114],[180,88],[166,102],[200,160],[200,205],[222,138],[222,174])],
+  steps:[{p:0,en:'Stand tall. Hold a chair or your hand if needed.',bn:'সোজা দাঁড়ান। দরকার হলে চেয়ার বা আপনার হাত ধরুন।'},
+         {p:1,en:'Lift your left knee. Swing the opposite arm.',bn:'বাম হাঁটু তুলুন। উল্টো হাত দোলান।'},
+         {p:2,en:'Lift your right knee. Keep a steady beat.',bn:'ডান হাঁটু তুলুন। তালে তালে চলুন।'},
+         {p:0,en:'Stop and take a breath.',bn:'থামুন এবং একটি শ্বাস নিন।'}]},
+ {t:'Kick the ball',stage:'2–10 years',cat:'Movement',bands:[2,3],ord:10,scene:'ball',reps:3,
+  poses:[P([180,40],[180,64],[180,114],[170,92],[160,115],[182,160],[182,205],[189,160],[191,205]),
+         P([180,40],[180,64],[180,114],[200,92],[214,112],[175,158],[150,180],[189,160],[191,205]),
+         P([180,40],[180,64],[180,114],[158,88],[142,100],[222,152],[266,190],[189,160],[191,205])],
+  steps:[{p:0,en:'Stand behind the ball. Hold a wall or a helper’s hand.',bn:'বলের পেছনে দাঁড়ান। দেয়াল বা সাহায্যকারীর হাত ধরুন।'},
+         {p:1,en:'Swing one leg back.',bn:'এক পা পেছনে নিন।'},
+         {p:2,en:'Kick the ball forward.',bn:'বলটিকে সামনে লাথি দিন।'},
+         {p:0,en:'Stand and cheer.',bn:'দাঁড়িয়ে আনন্দ করুন।'}]},
+ {t:'Tongue and mouth moves',stage:'1–12 years',kind:'face',cat:'Speech and feeding',bands:[1,2,3],ord:12,reps:3,
+  poses:[[34,0,0,0],[30,34,0,0],[30,24,1,0]],
+  steps:[{p:0,en:'Sit in front of a mirror with your child.',bn:'শিশুর সাথে আয়নার সামনে বসুন।'},
+         {p:1,en:'Open your mouth wide.',bn:'মুখ বড় করে খুলুন।'},
+         {p:2,en:'Stick your tongue out, then pull it back in.',bn:'জিভ বের করুন, তারপর ভেতরে নিন।'},
+         {p:0,en:'Close your mouth and smile.',bn:'মুখ বন্ধ করে হাসুন।'}]}
+];
+EX=EX.concat(NEWEX);
+EX.sort(function(a,b){return a.ord-b.ord;});
+
+function faceSVG(ex){
+  return '<svg viewBox="0 0 400 230" role="img" aria-label="Animated demonstration: '+ex.t+'">'+
+   '<circle id="fc-l" cx="148" cy="130" r="0" style="fill:var(--sun);stroke:var(--ink);stroke-width:2"/>'+
+   '<circle id="fc-r" cx="252" cy="130" r="0" style="fill:var(--sun);stroke:var(--ink);stroke-width:2"/>'+
+   '<circle cx="200" cy="112" r="88" style="fill:var(--sun);stroke:var(--ink);stroke-width:3"/>'+
+   '<circle id="fc-l2" cx="148" cy="130" r="0" style="fill:var(--sun)"/>'+
+   '<circle id="fc-r2" cx="252" cy="130" r="0" style="fill:var(--sun)"/>'+
+   '<circle cx="168" cy="92" r="8" style="fill:var(--ink)"/><circle cx="232" cy="92" r="8" style="fill:var(--ink)"/>'+
+   '<path d="M154 74 Q168 66 182 74 M218 74 Q232 66 246 74" fill="none" stroke-width="3" stroke-linecap="round" style="stroke:var(--ink)"/>'+
+   '<path id="fc-m" stroke-width="3" stroke-linejoin="round" style="fill:var(--ink);stroke:var(--ink)"/>'+
+   '<ellipse id="fc-t" rx="12" ry="8" style="fill:var(--tongue);stroke:var(--ink);stroke-width:2"/></svg>';
+}
+function faceDraw(q){
+  var w=q[0],o=q[1],t=q[2],c=q[3],cx=200,cy=142;
+  var m=$('#fc-m'), tg=$('#fc-t'); if(!m||!tg) return;
+  m.setAttribute('d','M'+(cx-w).toFixed(1)+' '+cy+' Q '+cx+' '+(cy-4)+' '+(cx+w).toFixed(1)+' '+cy+' Q '+cx+' '+(cy+6+o*1.9).toFixed(1)+' '+(cx-w).toFixed(1)+' '+cy+' Z');
+  tg.setAttribute('cx',cx); tg.setAttribute('cy',(cy+o*0.5+t*14).toFixed(1)); tg.style.opacity=t.toFixed(2);
+  ['fc-l','fc-r'].forEach(function(id){ $('#'+id).setAttribute('r',(c*26).toFixed(1)); });
+  ['fc-l2','fc-r2'].forEach(function(id){ $('#'+id).setAttribute('r',(c*24).toFixed(1)); });
+}
+
+/* session log */
+var DAY=86400000;
+function dayStart(d){ var x=new Date(d); x.setHours(0,0,0,0); return x.getTime(); }
+function weekCount(){ var from=dayStart(Date.now()-6*DAY); return S.log.filter(function(l){return l.ts>=from;}).length; }
+function weekLine(){ var n=weekCount(); return n+' of '+S.goal+' sessions this week'+(n>=S.goal?'. Goal reached.':''); }
+function logHTML(readonly){
+  var today=dayStart(Date.now()), days=[], max=1;
+  for(var i=6;i>=0;i--){ var s=today-i*DAY, c=S.log.filter(function(l){return l.ts>=s&&l.ts<s+DAY;}).length; if(c>max) max=c; days.push({s:s,c:c}); }
+  var bars=days.map(function(d){
+    var label=new Date(d.s).toLocaleDateString('en-GB',{weekday:'short'}), h=d.c?Math.max(10,Math.round(d.c/max*100)):3;
+    return '<div class="col"><span class="small">'+(d.c||'')+'</span><i style="height:'+h+'%;background:'+(d.c?'var(--accent)':'var(--line)')+'"></i><span class="small muted">'+label+'</span></div>';
+  }).join('');
+  var recent=S.log.slice(-5).reverse().map(function(l){
+    return '<li><div class="top"><b>'+esc(l.n)+'</b><span class="small muted">'+new Date(l.ts).toLocaleDateString('en-GB',{day:'numeric',month:'short'})+'</span></div></li>';
+  }).join('')||'<li class="muted">No sessions logged yet. Finish an exercise video and tap Log this session.</li>';
+  var n=weekCount(), pct=Math.min(100,n/S.goal*100).toFixed(0);
+  return '<h2>Exercise sessions</h2>'+
+   (readonly?'':'<label for="goal" style="max-width:220px">Weekly goal<select id="goal">'+[1,2,3,4,5,6,7].map(function(g){return '<option value="'+g+'"'+(g===S.goal?' selected':'')+'>'+g+' sessions</option>';}).join('')+'</select></label>')+
+   '<div class="pbar" role="progressbar" aria-label="Weekly goal"><div style="width:'+pct+'%"></div></div><p class="small muted">'+weekLine()+'</p>'+
+   '<div class="bars" aria-label="Sessions in the last 7 days">'+bars+'</div>'+
+   '<h3>Recent</h3><ul class="rows">'+recent+'</ul>';
+}
+
 VIEWS.videos=function(){
-  if(pl.ex===null) pl.ex=Math.min(band(S.child.age),3);
-  var ex=EX[pl.ex];
+  if(pl.ex===null){ var b0=band(S.child.age); pl.ex=0; EX.some(function(x,i){ if(x.bands.indexOf(b0)>-1){pl.ex=i;return true;} }); }
+  var ex=EX[pl.ex], b=band(S.child.age), cats=['All','Movement','Speech and feeding'];
   $('#v-videos').innerHTML=
    '<div class="head"><p class="eyebrow">Exercise videos</p><h1>Watch, listen, do together</h1>'+
-   '<p class="muted">Animated demonstrations with spoken steps and captions. They show the idea. Your physiotherapist shows the right way for your child.</p></div>'+
-   '<div class="seg" role="group" aria-label="Exercise">'+EX.map(function(x,i){return '<button type="button" data-ex="'+i+'" aria-pressed="'+(i===pl.ex)+'">'+x.t+' <span class="small">· '+x.stage+'</span></button>';}).join('')+'</div>'+
+   '<p class="muted">Animated demonstrations with spoken steps and captions. They show the idea. Your physiotherapist or speech therapist shows the right way for your child.</p></div>'+
+   '<div class="seg" role="group" aria-label="Category">'+cats.map(function(c){return '<button type="button" data-cat="'+c+'" aria-pressed="'+(c===pl.cat)+'">'+c+'</button>';}).join('')+'</div>'+
+   '<div class="seg" role="group" aria-label="Exercise">'+EX.map(function(x,i){
+      if(pl.cat!=='All'&&x.cat!==pl.cat) return '';
+      return '<button type="button" data-ex="'+i+'" aria-pressed="'+(i===pl.ex)+'">'+x.t+(x.bands.indexOf(b)>-1?' <span class="pill ok">for '+esc(S.child.name||'your child')+'</span>':'')+'</button>';
+   }).join('')+'</div>'+
    '<div class="grid2"><div class="card"><div class="stage">'+stageSVG(ex)+'<div class="cap" id="pl-cap" lang="'+pl.lang+'"></div></div>'+
    '<div class="pbar" role="progressbar" aria-label="Session progress"><div id="pl-fill"></div></div>'+
    '<div class="pmeta"><span id="pl-time"></span><span id="pl-rep"></span></div>'+
    '<div class="ctrl"><button class="btn" type="button" data-pl="play" id="pl-play">Play</button>'+
    '<button class="btn ghost" type="button" data-pl="restart">Restart</button>'+
-   '<div class="seg tight" role="group" aria-label="Speed"><button type="button" data-pl="slow" aria-pressed="'+(pl.speed<1)+'">Slow</button><button type="button" data-pl="normal" aria-pressed="'+(pl.speed>=1)+'">Normal</button></div>'+
+   '<button class="btn ghost" type="button" data-pl="log">Log this session</button></div>'+
+   '<div class="ctrl"><div class="seg tight" role="group" aria-label="Speed"><button type="button" data-pl="slow" aria-pressed="'+(pl.speed<1)+'">Slow</button><button type="button" data-pl="normal" aria-pressed="'+(pl.speed>=1)+'">Normal</button></div>'+
    '<div class="seg tight" role="group" aria-label="Language"><button type="button" data-pl="en" aria-pressed="'+(pl.lang==='en')+'">English</button><button type="button" data-pl="bn" aria-pressed="'+(pl.lang==='bn')+'">বাংলা</button></div>'+
    '<div class="seg tight"><button type="button" data-pl="sound" aria-pressed="'+pl.voice+'">Voice and chime: '+(pl.voice?'On':'Off')+'</button></div></div>'+
    '<p class="small muted">'+plNote()+'</p></div>'+
-   '<div class="card"><h2>'+ex.t+'</h2><p class="muted small">Suggested for '+ex.stage+'. Repeat '+ex.reps+' times, a few times a week, or as your therapist advises.</p>'+
+   '<div class="card"><h2>'+ex.t+'</h2><p class="muted small">Suggested for '+ex.stage+' · '+ex.cat+'. Repeat '+ex.reps+' times, a few times a week, or as your therapist advises.</p>'+
    '<ol class="steps" id="pl-steps" lang="'+pl.lang+'">'+ex.steps.map(function(s){return '<li>'+s[pl.lang]+'</li>';}).join('')+'</ol>'+
+   '<p class="small"><b id="wk-line">'+weekLine()+'</b></p>'+
    '<p class="small muted">Stop if your child seems in pain or upset, and tell the doctor about neck pain or new weakness.</p></div></div>';
   plRender();
 };
 document.addEventListener('click',function(e){
-  var t=e.target.closest('[data-ex],[data-pl]'); if(!t) return;
+  var t=e.target.closest('[data-ex],[data-pl],[data-cat],[data-watch],[data-reset]'); if(!t) return;
+  if(t.dataset.watch!==undefined){ plPause(); pl.ex=+t.dataset.watch; pl.t=0; pl.last=''; show('videos'); return; }
+  if(t.dataset.reset!==undefined){ try{ localStorage.removeItem('care21-demo'); }catch(x){} S=JSON.parse(JSON.stringify(DEFAULTS)); guideBand=null; pl.ex=null; pl.t=0; pl.last=''; show('home'); toast('Demo data reset.'); return; }
+  if(t.dataset.cat){ pl.cat=t.dataset.cat; VIEWS.videos(); return; }
   if(t.dataset.ex!==undefined){ plPause(); pl.ex=+t.dataset.ex; pl.t=0; pl.last=''; VIEWS.videos(); return; }
   var a=t.dataset.pl;
   if(a==='play'){ if(pl.playing) plPause(); else plPlay(); plRender(); }
   else if(a==='restart'){ plPause(); pl.t=0; pl.last=''; plPlay(); }
+  else if(a==='log'){ S.log.push({n:EX[pl.ex].t,ts:Date.now()}); save(); var w=$('#wk-line'); if(w) w.textContent=weekLine(); toast('Session logged: '+EX[pl.ex].t+'.'); }
   else if(a==='sound'){ pl.voice=!pl.voice; if(!pl.voice){ try{ window.speechSynthesis.cancel(); }catch(x){} } VIEWS.videos(); }
-  else if(a==='en'||a==='bn'){ pl.lang=a; try{ window.speechSynthesis.cancel(); }catch(x){} pl.last=''; VIEWS.videos(); }
+  else if(a==='en'||a==='bn'){ plPause(); pl.lang=a; pl.t=0; pl.last=''; VIEWS.videos(); }
   else if(a==='slow'){ pl.speed=0.6; VIEWS.videos(); }
   else if(a==='normal'){ pl.speed=1; VIEWS.videos(); }
 });
@@ -622,6 +1000,7 @@ document.addEventListener('change',function(e){
   var t=e.target;
   if(t.dataset.task){ if(t.checked) S.done[t.dataset.task]=1; else delete S.done[t.dataset.task]; save(); updateHome(); }
   else if(t.dataset.sign){ var i=+t.dataset.sign, p=S.signs.indexOf(i); if(t.checked&&p<0) S.signs.push(i); if(!t.checked&&p>-1) S.signs.splice(p,1); save(); updateSigns(); }
+  else if(t.id==='goal'){ S.goal=+t.value; save(); VIEWS.progress(); }
   else if(t.id==='d-city'){ docCity=t.value; updateDocs(); }
   else if(t.id==='d-spec'){ docSpec=t.value; updateDocs(); }
 });
