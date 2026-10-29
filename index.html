@@ -155,6 +155,22 @@ footer{color:var(--ink-2);font-size:.84rem}
   main{padding-bottom:110px}
   .toast{bottom:calc(64px + env(safe-area-inset-bottom,0px));padding-bottom:12px}
 }
+.ct-item{display:flex;flex-direction:column;gap:8px}
+.ct-item+.ct-item{border-top:1px solid var(--line);padding-top:16px}
+.ct-big{font:800 clamp(1.6rem,6vw,2.2rem)/1.1 var(--font-display);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.ct-addr{font:700 1.15rem var(--font-body)}
+.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+footer.site{display:flex;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;border-top:3px solid var(--sun);padding-top:16px;margin-top:8px}
+footer.site a{color:var(--accent);font-weight:700}
+.urgent{border:1px solid var(--warn);background:var(--warn-bg);color:var(--warn);font:800 .85rem var(--font-body);border-radius:999px;padding:7px 12px;cursor:pointer}
+.modal{position:fixed;inset:0;background:var(--scrim);display:flex;align-items:center;justify-content:center;padding:16px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));z-index:60;overflow-y:auto}
+.modal-box{background:var(--surface);border-radius:14px;padding:20px;max-width:460px;width:100%;display:flex;flex-direction:column;gap:12px;border-top:6px solid var(--warn)}
+.badge{display:inline-flex;padding:6px 12px;border-radius:999px;font-weight:700;font-size:.82rem;background:var(--surface-2);color:var(--ink-2)}
+.badge.on{background:var(--sun);color:var(--on-sun)}
+.faq{display:flex;flex-direction:column;gap:10px;max-width:70ch}
+.faq details{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:0 16px}
+.faq summary{padding:14px 0;font-weight:700;cursor:pointer}
+.faq details p{padding-bottom:14px;color:var(--ink-2)}
 .stage{position:relative;background:var(--surface-2);border-radius:10px;overflow:hidden}
 .stage svg{display:block;width:100%;height:auto}
 .cap{position:absolute;left:0;right:0;bottom:0;padding:10px 14px;background:var(--scrim);color:var(--on-scrim);font-weight:600;text-align:center;min-height:3.2em;display:flex;align-items:center;justify-content:center}
@@ -174,7 +190,7 @@ footer{color:var(--ink-2);font-size:.84rem}
       <svg width="30" height="26" viewBox="0 0 30 26" aria-hidden="true"><circle cx="9" cy="9" r="7" style="fill:var(--accent)"/><circle cx="21" cy="9" r="7" style="fill:var(--sun)"/><circle cx="15" cy="18" r="7" style="fill:var(--ink)"/></svg>
       <span><span id="brand-name">Anas’s Care Plan</span><small id="brand-sub">CARE21</small></span>
     </a>
-    <div class="bar-r"><button class="tsize" id="tsize" type="button" aria-pressed="false" aria-label="Larger text">A+</button><div class="role" role="group" aria-label="View as">
+    <div class="bar-r"><button class="urgent" id="urgent-btn" type="button">Urgent help</button><button class="tsize" id="tsize" type="button" aria-pressed="false" aria-label="Larger text">A+</button><div class="role" role="group" aria-label="View as">
       <button type="button" data-role="caregiver" aria-pressed="true">Caregiver</button>
       <button type="button" data-role="doctor" aria-pressed="false">Doctor</button>
     </div></div>
@@ -195,10 +211,21 @@ footer{color:var(--ink-2);font-size:.84rem}
   <section id="v-planner" data-view hidden></section>
   <section id="v-prescribe" data-view hidden></section>
   <section id="v-summary" data-view hidden></section>
+  <section id="v-contact" data-view hidden></section>
+  <section id="v-diary" data-view hidden></section>
+  <section id="v-help" data-view hidden></section>
+  <footer class="site"><span>© <span id="site-year">2026</span> XENONTECH. All rights reserved.</span><a href="#contact" data-go="contact">Contact us</a></footer>
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <nav class="bnav" id="bnav" aria-label="Main"></nav>
 <div class="sheet" id="more" hidden></div>
+<div class="modal" id="urgent" hidden role="dialog" aria-modal="true" aria-labelledby="urg-t"><div class="modal-box">
+  <h2 id="urg-t">Urgent help</h2>
+  <p>If your child is in danger, call <b>999</b> now. 999 is Bangladesh’s national emergency number.</p>
+  <p class="eyebrow">Get help right away if you see</p>
+  <ul class="plain" style="gap:6px"><li>• Trouble breathing, or blue lips</li><li>• Your child will not feed, or keeps vomiting</li><li>• A seizure</li><li>• Neck pain, new weakness, trouble walking, or loss of bladder control</li><li>• A fever that does not settle</li></ul>
+  <div class="row-actions"><a class="btn" href="tel:999">Call 999</a><button class="btn ghost" type="button" data-go="doctors" data-close-urgent>Find nearest doctor</button><button class="btn ghost" type="button" data-close-urgent>Close</button></div>
+</div></div>
 
 <script>
 (function(){
@@ -208,7 +235,7 @@ function esc(t){return String(t).replace(/[&<>"']/g,function(c){return {'&':'&am
 
 var DEFAULTS={
   child:{name:'Anas',age:18},
-  log:[], goal:3, chk:{heart:3,thyroid:12}, ordered:{hearing:true}, rx:[], notes:[],
+  diary:seedDiary(), growth:seedGrowth(), log:[], goal:3, chk:{heart:3,thyroid:12}, ordered:{hearing:true}, rx:[], notes:[],
   done:{},
   ms:{sit:12,crawl:14},
   tests:[
@@ -221,18 +248,20 @@ var DEFAULTS={
   ],
   signs:[]
 };
+function seedDiary(){ var n=Date.now(),D=86400000; return [{ts:n-2*D,mood:'Okay',sleep:9,feed:'Fair',note:'Cried at bedtime.'},{ts:n-D,mood:'Happy',sleep:10,feed:'Good',note:'Practised sitting.'}]; }
+function seedGrowth(){ var n=Date.now(),D=86400000; return [{ts:n-90*D,w:9.1,h:74},{ts:n-60*D,w:9.6,h:75.5},{ts:n-30*D,w:10,h:77}]; }
 var S;
 try{ var raw=localStorage.getItem('care21-demo'); S=raw?JSON.parse(raw):null; }catch(e){ S=null; }
 if(!S||!S.child||!S.ms){ S=JSON.parse(JSON.stringify(DEFAULTS)); }
 if(!S.log) S.log=[]; if(!S.goal) S.goal=3; if(S.child.name==='Aarav') S.child.name='Anas';
-if(!S.chk) S.chk={heart:3,thyroid:12}; if(!S.ordered) S.ordered={hearing:true}; if(!S.rx) S.rx=[]; if(!S.notes) S.notes=[];
+if(!S.chk) S.chk={heart:3,thyroid:12}; if(!S.ordered) S.ordered={hearing:true}; if(!S.rx) S.rx=[]; if(!S.notes) S.notes=[]; if(!S.diary) S.diary=seedDiary(); if(!S.growth) S.growth=seedGrowth();
 function save(){ try{ localStorage.setItem('care21-demo',JSON.stringify(S)); }catch(e){} }
 
 var R='caregiver', cur='home', guideBand=null;
 function renderBrand(){ var b=$('#brand-name'); if(b) b.textContent=(S.child.name||'Your child')+'’s Care Plan'; var u=$('#brand-sub'); if(u) u.textContent=(R==='doctor')?'CARE21 · Clinic view':'CARE21'; }
 var NAV={
-  caregiver:[['home','Home'],['signs','Early signs'],['guide','Care guide'],['videos','Exercise videos'],['progress','Progress'],['doctors','Find a doctor'],['info','Health info']],
-  doctor:[['patient','Overview'],['planner','Check-up planner'],['prescribe','Prescribe and message'],['summary','Visit summary']]
+  caregiver:[['home','Home'],['signs','Early signs'],['guide','Care guide'],['videos','Exercise videos'],['progress','Progress'],['diary','Daily diary'],['doctors','Find a doctor'],['info','Health info'],['help','Help'],['contact','Contact us']],
+  doctor:[['patient','Overview'],['planner','Check-up planner'],['prescribe','Prescribe and message'],['summary','Visit summary'],['contact','Contact us']]
 };
 
 var BANDS=[
@@ -348,6 +377,7 @@ VIEWS.home=function(){
       '<p class="muted small" id="c-stage"></p></div>'+
     '<div class="card"><h2>Today’s routine</h2><p class="muted small" id="r-count"></p><ul class="checks" id="r-list"></ul><div class="row-actions"><button class="btn ghost small" type="button" data-go="videos">Watch exercise videos</button></div></div>'+
     '<div class="card" id="rx-card"><h2>From your doctor</h2><div id="rx-body"></div></div>'+
+    '<div class="card"><h2>Achievements</h2><div id="ach-body"></div></div>'+
     '<div class="card"><h2>Recommended exercises</h2><p class="small"><b id="wk-home"></b></p><ul class="rows" id="rec-list"></ul></div>'+
     '<div class="card"><h2>Tests and doctor notes</h2><ul class="rows" id="t-list"></ul></div>'+
     '<div class="card"><h2>Upcoming</h2><ul class="rows" id="a-list"></ul>'+
@@ -369,7 +399,7 @@ function updateHome(){
   $('#r-count').textContent=n+' of '+TASKS[b].length+' done today';
   renderBrand();
   $('#wk-home').textContent=weekLine();
-  homeExtras();
+  homeExtras(); renderAch();
   $('#rec-list').innerHTML=EX.map(function(x,i){ return x.bands.indexOf(b)>-1?'<li><div class="top"><div><b>'+x.t+'</b><br><span class="small muted">'+x.cat+' · '+x.stage+'</span></div><button class="btn ghost small" type="button" data-watch="'+i+'">Watch</button></div></li>':''; }).join('')||'<li class="muted">No exercises for this age yet.</li>';
   $('#t-list').innerHTML=S.tests.map(function(t){
     return '<li><div class="top"><b>'+esc(t.n)+'</b><span class="pill '+(t.s==='Done'?'ok':'warn')+'">'+esc(t.s)+'</span></div><span class="muted small">'+esc(t.d)+(t.note?' · '+esc(t.note):'')+'</span></li>';
@@ -433,6 +463,8 @@ VIEWS.progress=function(){
    '<div class="head"><p class="eyebrow">Progress</p><h1>'+esc(S.child.name||'Your child')+'’s milestones</h1><p class="muted">Children with Down syndrome reach milestones on their own timeline. The bars show broad ranges, so a later date is not a failure. Share this view with the doctor.</p></div>'+
    '<div class="grid2"><div class="card">'+chartHTML(false)+'</div>'+
    '<div class="card">'+logHTML(false)+'</div>'+
+   '<div class="card">'+growthHTML()+'</div>'+
+   '<div class="card"><h2>Share with your doctor</h2><p class="muted small">Copies milestones, exercise, diary, growth and check-ups into one short report you can paste into a message.</p><div class="row-actions"><button class="btn" type="button" data-sharereport>Copy progress report</button></div><div id="rep-box"></div></div>'+
    '<div class="card"><h2>Log a milestone</h2><form id="ms-form"><div class="fields">'+
      '<label for="ms-k">Milestone<select id="ms-k">'+left.map(function(m){return '<option value="'+m.k+'">'+m.l+'</option>';}).join('')+'</select></label>'+
      '<label for="ms-a">Age reached (months)<input id="ms-a" type="number" min="0" max="300" value="'+S.child.age+'" inputmode="numeric"></label></div>'+
@@ -541,6 +573,7 @@ VIEWS.patient=function(){
      '<div class="row-actions"><button class="btn small" type="button" data-go="planner">Open check-up planner</button></div></div>'+
    '<div class="card">'+logHTML(true)+'</div>'+
    '<div class="card"><h2>Milestones</h2>'+chartHTML(true)+'</div>'+
+   '<div class="card">'+lifeHTML()+'</div>'+
    '<div class="card"><h2>Prescribed exercises</h2>'+(S.rx.length?'<ul class="rows">'+rxRows(false)+'</ul>':'<p class="muted">None yet.</p>')+
      '<div class="row-actions"><button class="btn small" type="button" data-go="prescribe">Prescribe an exercise</button></div></div>'+
    '</div>';
@@ -595,6 +628,7 @@ function summaryText(){
   L.push('Not yet: '+(not.join(', ')||'none'));
   L.push('');
   L.push('Home exercise: '+weekLine());
+  lifeLines().forEach(function(x){ L.push(x); });
   L.push('');
   L.push('Check-ups:');
   CHECKS.forEach(function(k){ var s=chkStatus(k); L.push('- '+k.n+': '+s.s+' ('+s.txt+')'); });
@@ -624,13 +658,14 @@ var ICONS={
  patient:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/>',
  planner:'<path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/>',
  prescribe:'<path d="M9 4h6v3H9zM6 6h12v15H6zM9 12h6M9 16h6"/>',
- summary:'<path d="M6 3h9l4 4v14H6zM9 12h7M9 16h7"/>'
+ summary:'<path d="M6 3h9l4 4v14H6zM9 12h7M9 16h7"/>',
+ contact:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/>'
 };
 var BN={
  caregiver:[['home','Home'],['videos','Videos'],['progress','Progress'],['doctors','Doctors'],['more','More']],
- doctor:[['patient','Overview'],['planner','Check-ups'],['prescribe','Prescribe'],['summary','Summary']]
+ doctor:[['patient','Overview'],['planner','Check-ups'],['prescribe','Prescribe'],['summary','Summary'],['contact','Contact']]
 };
-var MORE=[['signs','Early signs'],['guide','Care guide'],['info','Health info']];
+var MORE=[['signs','Early signs'],['guide','Care guide'],['diary','Daily diary'],['info','Health info'],['help','Help and FAQ'],['contact','Contact us']];
 function setScale(on){
   document.documentElement.style.setProperty('--scale',on?'1.2':'1');
   var b=$('#tsize'); if(b) b.setAttribute('aria-pressed',String(on));
@@ -981,6 +1016,200 @@ document.addEventListener('click',function(e){
   else if(a==='en'||a==='bn'){ plPause(); pl.lang=a; pl.t=0; pl.last=''; VIEWS.videos(); }
   else if(a==='slow'){ pl.speed=0.6; VIEWS.videos(); }
   else if(a==='normal'){ pl.speed=1; VIEWS.videos(); }
+});
+
+/* ---------- contact page ---------- */
+var CT={phone:'01880919005',addr:'Lalkhan Bazar, Chittagong',maps:'https://www.google.com/maps/search/?api=1&query=Lalkhan+Bazar+Chittagong'};
+var ctTopics=['Question about the app','Doctor or clinic partnership','Report a problem','Something else'];
+VIEWS.contact=function(){
+  $('#v-contact').innerHTML=
+   '<div class="head"><p class="eyebrow">Contact us</p><h1>Talk to the XENONTECH team</h1><p class="muted">Questions about Anas’s Care Plan, CARE21, or working with us? Call or visit. We reply to messages as soon as we can.</p></div>'+
+   '<div class="grid2">'+
+   '<div class="card"><h2>Reach us</h2>'+
+     '<div class="ct-item"><p class="eyebrow">Phone</p><p class="ct-big" id="ct-phone">'+CT.phone+'</p>'+
+       '<div class="row-actions"><a class="btn" href="tel:'+CT.phone+'">Call now</a><button class="btn ghost" type="button" data-copyphone>Copy number</button></div>'+
+       '<p class="small muted">Tapping Call now works on a phone. On a computer, copy the number.</p></div>'+
+     '<div class="ct-item"><p class="eyebrow">Address</p><p class="ct-addr" id="ct-addr">'+CT.addr+'</p>'+
+       '<div class="row-actions"><a class="btn ghost" href="'+CT.maps+'" target="_blank" rel="noopener">Open in Google Maps</a></div></div>'+
+   '</div>'+
+   '<div class="card" id="ct-card"></div></div>';
+  ctForm();
+};
+function ctForm(){
+  $('#ct-card').innerHTML=
+   '<h2>Send a message</h2><form id="ct-form" novalidate>'+
+   '<div class="fields"><label for="ct-name">Your name<input id="ct-name" type="text" maxlength="60" autocomplete="name"></label>'+
+   '<label for="ct-contact">Phone or email<input id="ct-contact" type="text" maxlength="80" autocomplete="off"></label></div>'+
+   '<label for="ct-topic">Topic<select id="ct-topic">'+ctTopics.map(function(t){return '<option>'+t+'</option>';}).join('')+'</select></label>'+
+   '<label for="ct-msg">Message<textarea id="ct-msg" maxlength="500"></textarea></label>'+
+   '<p class="small" id="ct-err" role="alert" style="color:var(--warn)"></p>'+
+   '<div class="row-actions"><button class="btn" type="submit">Send message</button></div></form>';
+}
+document.addEventListener('submit',function(e){
+  if(e.target.id!=='ct-form') return;
+  var n=$('#ct-name').value.trim(), m=$('#ct-msg').value.trim(), err=$('#ct-err');
+  if(!n){ err.textContent='Please enter your name.'; $('#ct-name').focus(); return; }
+  if(!m){ err.textContent='Please write a message.'; $('#ct-msg').focus(); return; }
+  $('#ct-card').innerHTML='<h2>Thank you, '+esc(n)+'</h2>'+
+   '<div class="result"><strong>This demo can’t send messages yet.</strong><p>Please call <b>'+CT.phone+'</b> so the team can help you right away.</p></div>'+
+   '<div class="row-actions"><button class="btn ghost" type="button" data-ctagain>Write another message</button></div>';
+});
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-copyphone],[data-ctagain]'); if(!t) return;
+  if(t.dataset.ctagain!==undefined){ ctForm(); return; }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(CT.phone).then(function(){ toast('Number copied: '+CT.phone); },function(){ ctSelect(); });
+  } else ctSelect();
+});
+function ctSelect(){ var el=$('#ct-phone'); if(!el) return; try{ var r=document.createRange(); r.selectNodeContents(el); var s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }catch(x){} toast('Number selected. Use your device’s copy command.'); }
+{ var yr=$('#site-year'); if(yr) yr.textContent=new Date().getFullYear(); }
+
+/* ---------- diary, growth, achievements, urgent help, help page ---------- */
+var MOODS=['Happy','Okay','Fussy'], FEEDS=['Good','Fair','Poor'];
+var dyMood='Happy', dyFeed='Good';
+function moodCls(m){ return m==='Happy'?'ok':(m==='Okay'?'':'warn'); }
+function feedCls(f){ return f==='Good'?'ok':(f==='Fair'?'':'warn'); }
+function fmtDay(t){ return new Date(t).toLocaleDateString('en-GB',{day:'numeric',month:'short'}); }
+function todayEntry(){ var t=dayStart(Date.now()); return S.diary.filter(function(d){return dayStart(d.ts)===t;})[0]; }
+function segBtns(list,attr,sel){ return list.map(function(x){ return '<button type="button" data-'+attr+'="'+x+'" aria-pressed="'+(x===sel)+'">'+x+'</button>'; }).join(''); }
+
+VIEWS.diary=function(){
+  var te=todayEntry(); if(te){ dyMood=te.mood; dyFeed=te.feed; }
+  var today=dayStart(Date.now()), cols='';
+  for(var i=6;i>=0;i--){
+    var s=today-i*DAY, e=S.diary.filter(function(d){return dayStart(d.ts)===s;})[0];
+    cols+='<div class="col"><span class="small">'+(e?e.sleep:'')+'</span><i style="height:'+(e?Math.max(8,Math.round(Math.min(e.sleep,12)/12*100)):3)+'%;background:'+(e?'var(--accent)':'var(--line)')+'"></i><span class="small muted">'+new Date(s).toLocaleDateString('en-GB',{weekday:'short'})+'</span></div>';
+  }
+  var recent=S.diary.slice().sort(function(a,b){return b.ts-a.ts;}).slice(0,5).map(function(d){
+    return '<li><div class="top"><b>'+fmtDay(d.ts)+'</b><span><span class="pill '+moodCls(d.mood)+'">'+d.mood+'</span> <span class="pill '+feedCls(d.feed)+'">Feeding: '+d.feed+'</span></span></div><span class="small muted">Slept '+d.sleep+' h'+(d.note?' · '+esc(d.note):'')+'</span></li>';
+  }).join('')||'<li class="muted">No entries yet.</li>';
+  $('#v-diary').innerHTML=
+   '<div class="head"><p class="eyebrow">Daily diary</p><h1>How was '+esc(S.child.name||'your child')+'’s day?</h1><p class="muted">A few taps a day. Your doctor sees the weekly pattern in Clinic view.</p></div>'+
+   '<div class="grid2"><form class="card" id="dy-form"><h2>Today</h2>'+
+   '<div><p class="eyebrow">Mood</p><div class="seg" role="group" aria-label="Mood">'+segBtns(MOODS,'mood',dyMood)+'</div></div>'+
+   '<label for="dy-sleep">Sleep last night (hours)<input id="dy-sleep" type="number" min="0" max="24" step="0.5" value="'+(te?te.sleep:9)+'" inputmode="decimal"></label>'+
+   '<div><p class="eyebrow">Feeding</p><div class="seg" role="group" aria-label="Feeding">'+segBtns(FEEDS,'feed',dyFeed)+'</div></div>'+
+   '<label for="dy-note">Note<input id="dy-note" type="text" maxlength="120" value="'+(te?esc(te.note||''):'')+'" placeholder="For example: practised sitting"></label>'+
+   '<div class="row-actions"><button class="btn" type="submit">'+(te?'Update today':'Save today')+'</button></div></form>'+
+   '<div class="card"><h2>Sleep, last 7 days</h2><div class="bars" aria-label="Hours of sleep, last 7 days">'+cols+'</div><h3>Recent days</h3><ul class="rows">'+recent+'</ul></div></div>';
+};
+
+function growthChart(){
+  var g=S.growth.slice().sort(function(a,b){return a.ts-b.ts;});
+  if(g.length<2) return '<p class="muted small">Add two or more measurements to see the weight line.</p>';
+  var ws=g.map(function(x){return x.w;}), lo=Math.min.apply(null,ws), hi=Math.max.apply(null,ws); if(hi-lo<0.5) hi=lo+0.5;
+  var t0=g[0].ts, t1=g[g.length-1].ts; if(t1===t0) t1=t0+1;
+  var X=function(t){return 40+(t-t0)/(t1-t0)*240;}, Y=function(w){return 100-(w-lo)/(hi-lo)*80;};
+  var pts=g.map(function(x){return X(x.ts).toFixed(1)+','+Y(x.w).toFixed(1);}).join(' ');
+  var dots=g.map(function(x){return '<circle cx="'+X(x.ts).toFixed(1)+'" cy="'+Y(x.w).toFixed(1)+'" r="5" style="fill:var(--sun);stroke:var(--ink);stroke-width:2"/>';}).join('');
+  var tx=function(x,y,a,t){return '<text x="'+x+'" y="'+y+'" text-anchor="'+a+'" font-size="10" style="fill:var(--ink-2)">'+t+'</text>';};
+  return '<svg viewBox="0 0 300 130" role="img" aria-label="Weight over time" style="width:100%;height:auto">'+
+   '<line x1="40" y1="100" x2="285" y2="100" stroke-width="1" style="stroke:var(--line)"/><line x1="40" y1="20" x2="40" y2="100" stroke-width="1" style="stroke:var(--line)"/>'+
+   '<polyline points="'+pts+'" fill="none" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" style="stroke:var(--accent)"/>'+dots+
+   tx(36,24,'end',hi.toFixed(1))+tx(36,104,'end',lo.toFixed(1))+tx(40,120,'start',fmtDay(t0))+tx(280,120,'end',fmtDay(t1))+tx(4,12,'start','kg')+'</svg>';
+}
+function growthHTML(){
+  var g=S.growth.slice().sort(function(a,b){return b.ts-a.ts;}), last=g[0];
+  return '<h2>Growth</h2>'+growthChart()+
+   (last?'<p class="small"><b>Latest:</b> '+last.w+' kg, '+last.h+' cm ('+fmtDay(last.ts)+')</p>':'')+
+   '<p class="small muted">Children with Down syndrome have their own growth charts. Your doctor will compare these numbers.</p>'+
+   '<form id="gr-form" novalidate><div class="fields"><label for="gr-w">Weight (kg)<input id="gr-w" type="number" min="2" max="60" step="0.1" inputmode="decimal"></label>'+
+   '<label for="gr-h">Height (cm)<input id="gr-h" type="number" min="30" max="200" step="0.1" inputmode="decimal"></label></div>'+
+   '<p class="small" id="gr-err" role="alert" style="color:var(--warn)"></p><div class="row-actions"><button class="btn small" type="submit">Add measurement</button></div></form>';
+}
+
+function lifeStats(){
+  var from=dayStart(Date.now()-6*DAY), d=S.diary.filter(function(x){return x.ts>=from;});
+  var avg=d.length?(d.reduce(function(a,x){return a+x.sleep;},0)/d.length).toFixed(1):null;
+  var mood={Happy:0,Okay:0,Fussy:0}; d.forEach(function(x){ mood[x.mood]++; });
+  var poor=d.filter(function(x){return x.feed==='Poor';}).length;
+  var g=S.growth.slice().sort(function(a,b){return a.ts-b.ts;}), last=g[g.length-1], prev=g[g.length-2];
+  return {n:d.length,avg:avg,mood:mood,poor:poor,last:last,prev:prev};
+}
+function lifeLines(){
+  var s=lifeStats(), L=[];
+  L.push('Daily diary (7 days): '+(s.n?s.n+' entries, average sleep '+s.avg+' h, mood happy '+s.mood.Happy+', okay '+s.mood.Okay+', fussy '+s.mood.Fussy+', poor feeding on '+s.poor+' days':'no entries'));
+  if(s.last) L.push('Latest growth: '+s.last.w+' kg, '+s.last.h+' cm ('+fmtDay(s.last.ts)+')'+(s.prev?', change since previous: '+(s.last.w-s.prev.w>=0?'+':'')+(s.last.w-s.prev.w).toFixed(1)+' kg':''));
+  return L;
+}
+function lifeHTML(){
+  var s=lifeStats();
+  return '<h2>Daily life and growth</h2><ul class="rows">'+
+   '<li><div class="top"><b>Sleep, 7-day average</b><span>'+(s.avg?s.avg+' h':'No entries')+'</span></div></li>'+
+   '<li><div class="top"><b>Mood</b><span class="small">Happy '+s.mood.Happy+' · Okay '+s.mood.Okay+' · Fussy '+s.mood.Fussy+'</span></div></li>'+
+   '<li><div class="top"><b>Poor feeding</b><span class="pill '+(s.poor?'warn':'ok')+'">'+s.poor+' day'+(s.poor===1?'':'s')+'</span></div></li>'+
+   '<li><div class="top"><b>Latest growth</b><span class="small">'+(s.last?s.last.w+' kg · '+s.last.h+' cm':'None')+'</span></div>'+(s.last&&s.prev?'<span class="small muted">'+((s.last.w-s.prev.w>=0)?'+':'')+(s.last.w-s.prev.w).toFixed(1)+' kg since the previous measurement</span>':'')+'</li></ul>';
+}
+
+function streak(){
+  var days={}; S.log.forEach(function(l){ days[dayStart(l.ts)]=1; });
+  var d=dayStart(Date.now()), n=0; if(!days[d]) d-=DAY;
+  while(days[d]){ n++; d-=DAY; } return n;
+}
+var BADGES=[
+ ['First session','Log your first exercise session.',function(){return S.log.length>=1;}],
+ ['3-day streak','Exercise on 3 days in a row.',function(){return streak()>=3;}],
+ ['Weekly goal','Reach your weekly session goal.',function(){return weekCount()>=S.goal;}],
+ ['First milestone','Log a milestone.',function(){return Object.keys(S.ms).length>0;}],
+ ['Diary habit','Save 3 diary entries.',function(){return S.diary.length>=3;}],
+ ['Growth check','Add 3 measurements.',function(){return S.growth.length>=3;}]
+];
+function renderAch(){
+  var el=$('#ach-body'); if(!el) return;
+  var n=0, chips=BADGES.map(function(b){ var on=b[2](); if(on) n++; return '<span class="badge'+(on?' on':'')+'" title="'+b[1]+'">'+b[0]+'</span>'; }).join('');
+  el.innerHTML='<p class="small"><b>Exercise streak:</b> '+streak()+' day'+(streak()===1?'':'s')+' · '+n+' of '+BADGES.length+' badges</p><div class="chips">'+chips+'</div><p class="small muted">Grey badges show what to do next: tap and hold, or hover, to see how.</p>';
+}
+
+VIEWS.help=function(){
+  var QA=[
+   ['Does this app diagnose Down syndrome?','No. Only a doctor’s chromosome test (karyotype) can confirm it. The Early signs page only suggests when to talk to a pediatrician.'],
+   ['How do I use it every day?','Open Home and tap Start today’s exercise. Log the session when it ends, then save a short diary entry. It takes a few minutes.'],
+   ['Who can see my child’s information?','This page is a demo with sample data. What you type stays in this browser on this device. In the full app, you will choose which doctor can see your child’s information.'],
+   ['How do I send progress to my doctor?','Open Progress and tap Copy progress report, then paste it into a message. In the full app, your doctor will see it in Clinic view.'],
+   ['The exercise voice is too fast or silent.','Tap Slow under the video. Voices come from your device. If a Bangla voice is missing, install one in your phone’s text-to-speech settings, or try Microsoft Edge. The captions always show.'],
+   ['What do the milestone bars mean?','They show broad ranges often reported for children with Down syndrome. A later date is not a failure. Every child follows their own timeline.'],
+   ['Who makes this app?','XENONTECH, Lalkhan Bazar, Chittagong. Phone 01880919005. Open Contact us to reach the team.']
+  ];
+  $('#v-help').innerHTML=
+   '<div class="head"><p class="eyebrow">Help and FAQ</p><h1>Quick answers</h1></div>'+
+   '<div class="faq">'+QA.map(function(q,i){ return '<details'+(i===0?' open':'')+'><summary>'+q[0]+'</summary><p>'+q[1]+'</p></details>'; }).join('')+'</div>'+
+   '<div class="row-actions"><button class="btn" type="button" data-go="contact">Contact the team</button><button class="btn ghost" type="button" data-go="info">Health checks</button></div>';
+};
+
+/* urgent help, report copy, diary and growth forms */
+function openUrgent(on){
+  var m=$('#urgent'); if(!m) return; m.hidden=!on;
+  if(on){ var c=m.querySelector('a.btn'); if(c) c.focus(); }
+}
+function copyReport(){
+  var box=$('#rep-box'); if(!box) return;
+  box.innerHTML='<pre class="sum" id="rep-pre"></pre>'; $('#rep-pre').textContent=summaryText();
+  var txt=summaryText();
+  var fallback=function(){ try{ var r=document.createRange(); r.selectNodeContents($('#rep-pre')); var s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }catch(x){} toast('Selected. Use your device’s copy command.'); };
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(function(){ toast('Progress report copied.'); },fallback); } else fallback();
+}
+document.addEventListener('click',function(e){
+  var t=e.target.closest('#urgent-btn,[data-close-urgent],[data-mood],[data-feed],[data-sharereport]');
+  if(e.target.id==='urgent'){ openUrgent(false); return; }
+  if(!t) return;
+  if(t.id==='urgent-btn'){ openUrgent(true); return; }
+  if(t.dataset.closeUrgent!==undefined){ openUrgent(false); return; }
+  if(t.dataset.mood){ dyMood=t.dataset.mood; $$('[data-mood]').forEach(function(b){ b.setAttribute('aria-pressed',String(b===t)); }); return; }
+  if(t.dataset.feed){ dyFeed=t.dataset.feed; $$('[data-feed]').forEach(function(b){ b.setAttribute('aria-pressed',String(b===t)); }); return; }
+  if(t.dataset.sharereport!==undefined){ copyReport(); }
+});
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') openUrgent(false); });
+document.addEventListener('submit',function(e){
+  if(e.target.id==='dy-form'){
+    var sl=parseFloat($('#dy-sleep').value); if(isNaN(sl)||sl<0||sl>24){ toast('Enter sleep hours between 0 and 24.'); return; }
+    var entry={ts:Date.now(),mood:dyMood,sleep:sl,feed:dyFeed,note:$('#dy-note').value.trim()}, t=dayStart(Date.now());
+    S.diary=S.diary.filter(function(d){return dayStart(d.ts)!==t;}); S.diary.push(entry); save(); VIEWS.diary(); toast('Diary saved for today.');
+  } else if(e.target.id==='gr-form'){
+    var w=parseFloat($('#gr-w').value), h=parseFloat($('#gr-h').value), err=$('#gr-err');
+    if(isNaN(w)||w<2||w>60){ err.textContent='Enter weight in kg, between 2 and 60.'; $('#gr-w').focus(); return; }
+    if(isNaN(h)||h<30||h>200){ err.textContent='Enter height in cm, between 30 and 200.'; $('#gr-h').focus(); return; }
+    S.growth.push({ts:Date.now(),w:w,h:h}); save(); VIEWS.progress(); toast('Measurement added.');
+  }
 });
 
 /* ---------- events ---------- */
