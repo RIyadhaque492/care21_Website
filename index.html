@@ -171,6 +171,10 @@ footer.site a{color:var(--accent);font-weight:700}
 .faq details{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:0 16px}
 .faq summary{padding:14px 0;font-weight:700;cursor:pointer}
 .faq details p{padding-bottom:14px;color:var(--ink-2)}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,120px),1fr));gap:8px}
+.thumbs img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+label.btn{cursor:pointer;flex-direction:row;font-size:.92rem}
+label.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line)}
 .stage{position:relative;background:var(--surface-2);border-radius:10px;overflow:hidden}
 .stage svg{display:block;width:100%;height:auto}
 .cap{position:absolute;left:0;right:0;bottom:0;padding:10px 14px;background:var(--scrim);color:var(--on-scrim);font-weight:600;text-align:center;min-height:3.2em;display:flex;align-items:center;justify-content:center}
@@ -999,8 +1003,9 @@ VIEWS.videos=function(){
    '<div class="card"><h2>'+ex.t+'</h2><p class="muted small">Suggested for '+ex.stage+' · '+ex.cat+'. Repeat '+ex.reps+' times, a few times a week, or as your therapist advises.</p>'+
    '<ol class="steps" id="pl-steps" lang="'+pl.lang+'">'+ex.steps.map(function(s){return '<li>'+s[pl.lang]+'</li>';}).join('')+'</ol>'+
    '<p class="small"><b id="wk-line">'+weekLine()+'</b></p>'+
-   '<p class="small muted">Stop if your child seems in pain or upset, and tell the doctor about neck pain or new weakness.</p></div></div>';
-  plRender();
+   '<p class="small muted">Stop if your child seems in pain or upset, and tell the doctor about neck pain or new weakness.</p></div></div>'+
+   '<div class="card" id="tc-card"></div>';
+  plRender(); tcRender();
 };
 document.addEventListener('click',function(e){
   var t=e.target.closest('[data-ex],[data-pl],[data-cat],[data-watch],[data-reset]'); if(!t) return;
@@ -1167,6 +1172,7 @@ VIEWS.help=function(){
    ['Who can see my child’s information?','This page is a demo with sample data. What you type stays in this browser on this device. In the full app, you will choose which doctor can see your child’s information.'],
    ['How do I send progress to my doctor?','Open Progress and tap Copy progress report, then paste it into a message. In the full app, your doctor will see it in Clinic view.'],
    ['The exercise voice is too fast or silent.','Tap Slow under the video. Voices come from your device. If a Bangla voice is missing, install one in your phone’s text-to-speech settings, or try Microsoft Edge. The captions always show.'],
+   ['How does the technique check work?','On the Exercise videos page, record a short video or choose photos of the exercise. Claude looks at up to four pictures and gives friendly tips on position, support and safety. It cannot judge movement from still pictures, and it does not replace your physiotherapist.'],
    ['What do the milestone bars mean?','They show broad ranges often reported for children with Down syndrome. A later date is not a failure. Every child follows their own timeline.'],
    ['Who makes this app?','XENONTECH, Lalkhan Bazar, Chittagong. Phone 01880919005. Open Contact us to reach the team.']
   ];
@@ -1211,6 +1217,136 @@ document.addEventListener('submit',function(e){
     S.growth.push({ts:Date.now(),w:w,h:h}); save(); VIEWS.progress(); toast('Measurement added.');
   }
 });
+
+/* ---------- technique check: photos or a short video, reviewed by Claude ---------- */
+var tc={ready:null,sample:null,max:0,frames:[],busy:false,msg:'',err:'',result:null,ctl:null,exIdx:-1};
+function tcClear(){ tc.frames.forEach(function(f){ try{ URL.revokeObjectURL(f.url); }catch(e){} }); tc.frames=[]; tc.result=null; tc.err=''; tc.busy=false; }
+function tcDraw(src,w,h){
+  return new Promise(function(res,rej){
+    var k=Math.min(1,800/Math.max(w,h)), c=document.createElement('canvas'); c.width=Math.max(1,Math.round(w*k)); c.height=Math.max(1,Math.round(h*k));
+    try{ c.getContext('2d').drawImage(src,0,0,c.width,c.height); }catch(e){ rej(e); return; }
+    c.toBlob(function(b){ if(!b){ rej(new Error('blob')); return; } res({blob:b,url:URL.createObjectURL(b)}); },'image/jpeg',0.85);
+  });
+}
+function tcImages(files){
+  return Promise.all(files.map(function(f){
+    return new Promise(function(res,rej){
+      var u=URL.createObjectURL(f), im=new Image();
+      im.onload=function(){ tcDraw(im,im.naturalWidth,im.naturalHeight).then(function(r){ URL.revokeObjectURL(u); res(r); },rej); };
+      im.onerror=function(){ URL.revokeObjectURL(u); rej(new Error('image')); };
+      im.src=u;
+    });
+  }));
+}
+function tcVideo(file,n){
+  return new Promise(function(res,rej){
+    var u=URL.createObjectURL(file), v=document.createElement('video'), out=[];
+    v.muted=true; v.playsInline=true; v.preload='auto';
+    var fail=function(){ URL.revokeObjectURL(u); rej(new Error('video')); };
+    v.onerror=fail;
+    v.onloadedmetadata=function(){
+      var d=v.duration; if(!isFinite(d)||d<=0){ fail(); return; }
+      var times=[]; for(var i=0;i<n;i++) times.push(d*(0.12+0.76*i/(n-1)));
+      var step=function(i){
+        if(i>=times.length){ URL.revokeObjectURL(u); res(out); return; }
+        var done=false, t=setTimeout(function(){ if(!done){ done=true; fail(); } },6000);
+        v.onseeked=function(){
+          if(done) return; done=true; clearTimeout(t);
+          tcDraw(v,v.videoWidth,v.videoHeight).then(function(r){ out.push(r); step(i+1); },fail);
+        };
+        v.currentTime=times[i];
+      };
+      step(0);
+    };
+    v.src=u;
+  });
+}
+function tcPrepare(fileList){
+  var files=Array.prototype.slice.call(fileList||[]); if(!files.length) return;
+  tcClear(); tc.busy=true; tc.msg='Preparing your pictures…'; tcRender();
+  var vid=files.filter(function(f){return /^video\//.test(f.type);})[0];
+  var imgs=files.filter(function(f){return /^image\//.test(f.type);}).slice(0,tc.max||4);
+  var job=vid?tcVideo(vid,Math.min(4,tc.max||4)):tcImages(imgs);
+  job.then(function(fr){ tc.frames=fr; tc.busy=false; if(!fr.length) tc.err='Choose at least one photo or a short video.'; tcRender(); },
+           function(){ tc.busy=false; tc.err='We could not read that file. Try another photo or a shorter video.'; tcRender(); });
+}
+function tcCopy(code){
+  if(code==='not_granted'||code==='sampling_disabled'||code==='not_declared'||code==='capability_disabled') return 'Feedback is turned off for this page. Allow Claude for this page in the viewer, then try again.';
+  if(code==='rate_limited') return 'Too many requests right now. Wait a minute, then try again.';
+  if(code==='image_rejected'||code==='images_unavailable') return 'One of the pictures could not be used. Choose different photos.';
+  if(code==='session_expired') return 'Please sign in again, then try again.';
+  return 'We could not get feedback this time. Try again with clearer pictures.';
+}
+function tcList(a){ return (Array.isArray(a)?a:[]).map(function(x){return String(x).trim();}).filter(Boolean).slice(0,4); }
+function tcCheck(){
+  if(!tc.sample||!tc.frames.length||tc.busy) return;
+  var ex=EX[pl.ex], bn=(pl.lang==='bn');
+  var steps=ex.steps.map(function(s,i){ return (i+1)+'. '+s.en; }).join('\n');
+  var prompt=[
+   'You are helping a caregiver practise a home exercise with a child who has Down syndrome. The '+tc.frames.length+' image(s) are frames, in time order, from the caregiver’s own photos or video.',
+   'Exercise: '+ex.t+' ('+ex.cat+'), suggested for '+ex.stage+'. Steps the app teaches:\n'+steps,
+   'Give short, kind, practical feedback on how the exercise is being done, based only on what is visible. Rules: still frames cannot show movement quality, and you are not the child’s physiotherapist or doctor, so stay with clear observations such as position, support, surface, setting and safety. Never identify anyone and never guess a child’s age or health. If the child or caregiver is not clearly visible, or the pictures do not show this exercise, say so in "unclear". Put something in "safety" only if you actually see a concern, for example an unsupported head or neck, a hard or unsafe surface, hazards nearby, or a child who looks distressed.',
+   'Write every string in '+(bn?'simple Bangla (Bengali script)':'simple English')+'.',
+   'Reply with only JSON: {"summary": string (one sentence), "good": [up to 3 short strings], "adjust": [up to 3 short strings, each one concrete action], "safety": [strings, may be empty], "unclear": string (empty if nothing is unclear)}'
+  ].join('\n\n');
+  tc.busy=true; tc.err=''; tc.msg='Looking carefully…'; tc.ctl=new AbortController(); tcRender();
+  tc.sample.json(prompt,{images:tc.frames.map(function(f){return f.blob;}),signal:tc.ctl.signal,modelTier:'default',cache:false}).then(function(r){
+    tc.busy=false;
+    tc.result={summary:String((r&&r.summary)||'').trim(),good:tcList(r&&r.good),adjust:tcList(r&&r.adjust),safety:tcList(r&&r.safety),unclear:String((r&&r.unclear)||'').trim()};
+    tcRender();
+  },function(e){
+    tc.busy=false; if(!e||e.code!=='cancelled') tc.err=tcCopy(e&&e.code); tcRender();
+  });
+}
+function tcRender(){
+  var el=$('#tc-card'); if(!el) return;
+  if(tc.exIdx!==pl.ex){ tcClear(); tc.exIdx=pl.ex; }
+  var ex=EX[pl.ex], head='<h2>Check my technique</h2>', body='';
+  if(tc.ready===null) body='<p class="muted small">Checking whether technique feedback is available…</p>';
+  else if(!tc.ready) body='<p class="muted">Technique feedback works when this page is open in Claude, on claude.ai or in the Claude app. A live camera view is not available in this web demo.</p><p class="small muted">Until then, ask your physiotherapist to watch one session and show you the right position.</p>';
+  else if(tc.busy) body='<p role="status"><b>'+esc(tc.msg)+'</b></p><div class="row-actions">'+(tc.frames.length?'<button class="btn ghost small" type="button" data-tc="stop">Stop</button>':'')+'</div>';
+  else if(tc.result){
+    var r=tc.result, li=function(a,cls){ return a.length?'<ul class="plain" style="gap:6px">'+a.map(function(x){return '<li>• '+esc(x)+'</li>';}).join('')+'</ul>':''; };
+    body=(r.summary?'<p><b>'+esc(r.summary)+'</b></p>':'')+
+      (r.good.length?'<h3>What looks good</h3>'+li(r.good):'')+
+      (r.adjust.length?'<h3>Try this next time</h3>'+li(r.adjust):'')+
+      (r.safety.length?'<div class="result warn"><strong>Safety</strong>'+li(r.safety)+'</div>':'')+
+      (r.unclear?'<p class="small muted"><b>Hard to see:</b> '+esc(r.unclear)+'</p>':'')+
+      '<p class="small muted">This is a guide from AI looking at a few pictures. It can miss things and does not replace your physiotherapist or doctor.</p>'+
+      '<div class="row-actions"><button class="btn small" type="button" data-pl="log">Log this session</button><button class="btn ghost small" type="button" data-tc="again">Check again</button></div>';
+  } else if(tc.frames.length){
+    body='<div class="thumbs">'+tc.frames.map(function(f,i){return '<img src="'+f.url+'" alt="Picture '+(i+1)+' of '+tc.frames.length+' to review">';}).join('')+'</div>'+
+      '<p class="small muted">These pictures stay on this device until you tap Get feedback. Then they are sent to Claude to review. This page does not save them. You can frame only hands and body if you prefer.</p>'+
+      '<div class="row-actions"><button class="btn" type="button" data-tc="check">Get feedback</button><button class="btn ghost" type="button" data-tc="again">Choose again</button></div>';
+  } else {
+    body='<p class="muted">Record yourself doing <b>'+esc(ex.t)+'</b> with your child, or choose up to '+tc.max+' photos. You will get friendly tips on position, support and safety.</p>'+
+      '<div class="row-actions"><label class="btn" for="tc-rec">Record a short video</label><label class="btn ghost" for="tc-pick">Choose photos or video</label></div>'+
+      '<input id="tc-rec" type="file" accept="video/*" capture="environment" hidden><input id="tc-pick" type="file" accept="image/*,video/*" multiple hidden>'+
+      '<p class="small muted">Tip: place the phone so the whole exercise is in view, in good light, and keep it still.</p>';
+  }
+  el.innerHTML=head+body+(tc.err?'<p class="small" role="alert" style="color:var(--warn)">'+esc(tc.err)+'</p>':'');
+}
+document.addEventListener('change',function(e){
+  if(e.target.id==='tc-rec'||e.target.id==='tc-pick'){ var f=e.target.files; tcPrepare(f); }
+});
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-tc]'); if(!t) return;
+  var a=t.dataset.tc;
+  if(a==='check') tcCheck();
+  else if(a==='again'){ tcClear(); tcRender(); }
+  else if(a==='stop'){ if(tc.ctl) tc.ctl.abort(); }
+});
+(function(){
+  var done=function(){ if(cur==='videos') tcRender(); };
+  try{
+    if(window.claude&&window.claude.use){
+      window.claude.use('sample').then(function(s){
+        if(!s) { tc.ready=false; return; }
+        return s.limits().then(function(l){ tc.sample=s; tc.max=(l&&l.images)?Math.min(4,l.images.maxCount):0; tc.ready=tc.max>0; },function(){ tc.ready=false; });
+      }).catch(function(){ tc.ready=false; }).then(done);
+    } else tc.ready=false;
+  }catch(e){ tc.ready=false; }
+})();
 
 /* ---------- events ---------- */
 document.addEventListener('click',function(e){
